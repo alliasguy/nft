@@ -54,12 +54,30 @@ async function sanitiseSvg(file: File): Promise<File> {
   // Strip all inline event handlers
   const EVENT_ATTRS = ["onload","onerror","onclick","onmouseover","onmouseout","onfocus","onblur"];
   doc.querySelectorAll("*").forEach(el => {
+    // Strip all inline event handlers
     EVENT_ATTRS.forEach(attr => el.removeAttribute(attr));
-    // Also strip href/xlink:href pointing to javascript:
-    const href = el.getAttribute("href") || el.getAttribute("xlink:href");
-    if (href?.toLowerCase().startsWith("javascript:")) {
-      el.removeAttribute("href");
-      el.removeAttribute("xlink:href");
+
+    // Strip href / xlink:href pointing to javascript: or external URLs
+    for (const attr of ["href", "xlink:href", "src"]) {
+      const val = el.getAttribute(attr);
+      if (!val) continue;
+      const lower = val.trim().toLowerCase();
+      // Block javascript:, data: (HTML/XML payloads), and external http(s) on <use>/<image>
+      const isUseOrImage = ["use","image","feimage"].includes(el.tagName.toLowerCase());
+      if (
+        lower.startsWith("javascript:") ||
+        lower.startsWith("data:text") ||
+        lower.startsWith("data:application") ||
+        (isUseOrImage && (lower.startsWith("http:") || lower.startsWith("https:")))
+      ) {
+        el.removeAttribute(attr);
+      }
+    }
+
+    // Strip style attributes containing url() — can load external resources or data URIs
+    const style = el.getAttribute("style");
+    if (style && /url\s*\(/i.test(style)) {
+      el.removeAttribute("style");
     }
   });
 

@@ -3,7 +3,7 @@
 -- Run in Supabase SQL Editor
 -- ============================================================
 -- Allows the current owner of an NFT to update its price and
--- sale type (buy-now or auction) so it reappears in the marketplace.
+-- sale type (buy-now or auction) so it reappears in the marketplace. 
 --
 -- Authorisation: caller must be either
 --   a) the creator of an NFT that has never been sold (no ownership record), OR
