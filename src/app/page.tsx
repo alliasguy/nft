@@ -58,11 +58,6 @@ export default async function Home() {
             {/* Left: copy */}
             <div className="hero-text stagger">
 
-              <span className="badge badge-accent animate-fade-in-up" style={{ alignSelf: "flex-start" }}>
-                <span className="nft-card__live-dot" />
-                &nbsp;Live Auctions — Bidding Open Now
-              </span>
-
               <h1 className="text-display animate-fade-in-up">
                 Discover &amp;&nbsp;Collect<br />
                 <span className="gradient-text">Extraordinary</span> NFTs
@@ -118,9 +113,6 @@ export default async function Home() {
                       <p className="featured-card__creator-role">{HERO_NFT.creator.handle}</p>
                     </div>
                   </div>
-                  <span className="badge badge-accent">
-                    <span className="nft-card__live-dot" />&nbsp;Live
-                  </span>
                 </div>
 
                 {/* Artwork — clicking navigates to the detail page */}
@@ -181,6 +173,7 @@ export default async function Home() {
                   likes={nft.likes}
                   isLive={nft.isLive}
                   badge={nft.badge}
+                  image={nft.image_url ?? undefined}
                   gradient={gradient(nft)}
                 />
               </ScrollReveal>
@@ -217,6 +210,7 @@ export default async function Home() {
                   likes={nft.likes}
                   isLive={nft.isLive}
                   badge={nft.badge}
+                  image={nft.image_url ?? undefined}
                   gradient={gradient(nft)}
                 />
               </ScrollReveal>

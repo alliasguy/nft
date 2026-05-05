@@ -124,6 +124,7 @@ export default function CollectionsPage() {
                   likes={nft.likes}
                   isLive={nft.isLive}
                   badge={nft.badge}
+                  image={nft.image_url ?? undefined}
                   gradient={gradient(nft)}
                 />
               ))}

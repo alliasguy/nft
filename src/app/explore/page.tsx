@@ -286,6 +286,7 @@ export default function ExplorePage() {
                   likes={nft.likes}
                   isLive={nft.isLive}
                   badge={nft.badge}
+                  image={nft.image_url ?? undefined}
                   gradient={`linear-gradient(135deg, ${nft.art.stops[0]} 0%, ${nft.art.stops[1]} 100%)`}
                 />
               ))}

@@ -249,12 +249,6 @@ export default async function NFTDetailPage({
               <span className="badge badge-neutral">{category}</span>
               <span className="badge badge-neutral">{collection}</span>
               <span className="badge badge-neutral">Token #{tokenId}</span>
-              {isAuction && (
-                <span className="badge badge-accent">
-                  <span className="nft-card__live-dot" />
-                  &nbsp;Live Auction
-                </span>
-              )}
             </div>
           </div>
 

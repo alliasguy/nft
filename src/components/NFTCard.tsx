@@ -255,11 +255,7 @@ export default function NFTCard({
 
         {/* Badges */}
         <div className="nft-card__badges">
-          {isLive ? (
-            <span className="badge badge-success" style={{ display:"flex", alignItems:"center", gap:"0.3rem" }}>
-              <span className="nft-card__live-dot" aria-hidden /> Live
-            </span>
-          ) : badge ? (
+          {badge ? (
             <span className="badge badge-gold">{badge}</span>
           ) : null}
         </div>
