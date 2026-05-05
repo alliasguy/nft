@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Relist / Sell NFT
+-- Artsorbit — Relist / Sell NFT
 -- Run in Supabase SQL Editor
 -- ============================================================
 -- Allows the current owner of an NFT to update its price and

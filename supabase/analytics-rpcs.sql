@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Admin Analytics RPC Functions
+-- Artsorbit — Admin Analytics RPC Functions
 -- Run in Supabase SQL Editor
 -- ============================================================
 

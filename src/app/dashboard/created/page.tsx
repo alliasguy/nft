@@ -90,7 +90,6 @@ export default function CreatedPage() {
             </p>
             <p style={{ fontSize:"0.9375rem", color:"var(--text-secondary)", marginBottom:"1.75rem", maxWidth:"40ch", margin:"0 auto 1.75rem" }}>
               Start creating and your minted works will appear here.
-              First 30 days are fee-free.
             </p>
             <Link href="/create" className="btn btn-gradient" style={{ borderRadius:"9999px" }}>
               Mint Your First NFT

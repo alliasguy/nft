@@ -61,7 +61,7 @@ function IconTelegram() {
 /* ── Logo ────────────────────────────────────────────────── */
 function FooterLogo() {
   return (
-    <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }} aria-label="NFTX home">
+    <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }} aria-label="Artsorbit home">
       <svg width="26" height="26" viewBox="0 0 30 30" fill="none" aria-hidden>
         <defs>
           <linearGradient id="footer-logo-g" x1="0" y1="0" x2="30" y2="30" gradientUnits="userSpaceOnUse">
@@ -74,7 +74,7 @@ function FooterLogo() {
         <path d="M15 2L2 15L15 9Z"        fill="rgba(255,255,255,0.12)" />
       </svg>
       <span style={{ fontWeight: 800, fontSize: "1.25rem", letterSpacing: "-0.025em", background: "linear-gradient(135deg,#e11d48,#c026d3)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-        NFTX
+        Artsorbit
       </span>
     </Link>
   );
@@ -102,11 +102,11 @@ export default function Footer() {
           <div>
             <FooterLogo />
             <p className="footer__brand-desc">
-              NFTX is the premier marketplace for rare digital art and collectibles.
+              Artsorbit is the premier marketplace for rare digital art and collectibles.
               We connect visionary creators with passionate collectors through
               transparent, on-chain trading you can trust.
             </p>
-            <div className="footer__socials" aria-label="Follow NFTX on social media">
+            <div className="footer__socials" aria-label="Follow Artsorbit on social media">
               {SOCIALS.map(({ Icon, label }) => (
                 <a
                   key={label}
@@ -164,7 +164,7 @@ export default function Footer() {
         {/* ── Bottom bar ── */}
         <div className="footer__bottom">
           <p className="footer__copyright">
-            © {year} NFTX, Inc. All rights reserved.
+            © {year} Artsorbit, Inc. All rights reserved.
           </p>
           <ul className="footer__legal">
             {[

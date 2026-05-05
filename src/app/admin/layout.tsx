@@ -1,6 +1,6 @@
 import AdminSidebar from "@/components/AdminSidebar";
 
-export const metadata = { title: "Admin Console — NFTX" };
+export const metadata = { title: "Admin Console — Artsorbit" };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -198,10 +198,10 @@ export default function Navbar() {
       <div className="container navbar__inner">
 
         {/* Logo */}
-        <Link href="/" className="navbar__logo" aria-label="NFTX — go to homepage">
+        <Link href="/" className="navbar__logo" aria-label="Artsorbit — go to homepage">
           <LogoMark/>
           <span className="gradient-text" style={{ fontWeight:800, fontSize:"1.25rem", letterSpacing:"-0.025em" }}>
-            NFTX
+            Artsorbit
           </span>
         </Link>
 

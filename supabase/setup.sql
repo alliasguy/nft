@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Complete Setup  (schema + seed + grants)
+-- Artsorbit — Complete Setup  (schema + seed + grants)
 -- ============================================================
 -- Paste this ENTIRE file into:
 --   Supabase Dashboard → SQL Editor → New query → Run

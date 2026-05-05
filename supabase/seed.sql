@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Seed Data  (run AFTER schema.sql)
+-- Artsorbit — Seed Data  (run AFTER schema.sql)
 -- ============================================================
 -- Populates the database with all 16 demo NFTs, their traits,
 -- and bid history so the site works immediately after setup.

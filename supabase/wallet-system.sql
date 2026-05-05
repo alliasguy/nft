@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Internal Wallet System
+-- Artsorbit — Internal Wallet System
 -- Run in Supabase SQL Editor after setup.sql + likes-and-buy.sql
 -- ============================================================
 

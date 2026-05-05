@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Admin User Management RPC
+-- Artsorbit — Admin User Management RPC
 -- Run in Supabase SQL Editor
 -- ============================================================
 

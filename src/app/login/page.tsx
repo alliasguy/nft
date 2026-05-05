@@ -40,7 +40,7 @@ function LogoMark() {
       <span style={{ fontWeight: 800, fontSize: "1.25rem", letterSpacing: "-0.025em",
         background: "linear-gradient(135deg,#e11d48,#c026d3)",
         WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-        NFTX
+        Artsorbit
       </span>
     </Link>
   );
@@ -128,7 +128,7 @@ function LoginContent() {
         <div className="auth-card">
 
           <p className="auth-title">Welcome back</p>
-          <p className="auth-subtitle">Sign in to your NFTX account to continue collecting.</p>
+          <p className="auth-subtitle">Sign in to your Artsorbit account to continue collecting.</p>
 
           {status === "error" && (
             <div style={{ padding: "0.75rem 1rem", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)",

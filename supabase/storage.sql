@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Supabase Storage Bucket for NFT Assets
+-- Artsorbit — Supabase Storage Bucket for NFT Assets
 -- Run in Supabase SQL Editor
 -- ============================================================
 -- Alternatively create via: Dashboard → Storage → New bucket

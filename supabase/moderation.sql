@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — NFT Moderation System
+-- Artsorbit — NFT Moderation System
 -- Run in Supabase SQL Editor
 -- ============================================================
 

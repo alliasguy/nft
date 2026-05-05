@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Complete Database Schema
+-- Artsorbit — Complete Database Schema
 -- ============================================================
 -- Run this once in the Supabase SQL Editor:
 --   Dashboard → SQL Editor → New query → paste → Run

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Email Verified — NFTX" };
+export const metadata = { title: "Email Verified — Artsorbit" };
 
 export default function VerifiedPage() {
   return (
@@ -57,7 +57,7 @@ export default function VerifiedPage() {
               background: "linear-gradient(135deg,#e11d48,#c026d3)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             }}>
-              NFTX
+              Artsorbit
             </span>
           </div>
 
@@ -78,7 +78,7 @@ export default function VerifiedPage() {
             color: "var(--text-secondary)",
             lineHeight: 1.65,
           }}>
-            Your NFTX account is now active. You can start collecting, creating,
+            Your Artsorbit account is now active. You can start collecting, creating,
             and trading rare digital art.
           </p>
 

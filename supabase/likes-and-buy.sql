@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Likes & Purchases
+-- Artsorbit — Likes & Purchases
 -- Run this in Supabase SQL Editor after setup.sql
 -- ============================================================
 

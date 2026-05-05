@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Update mint_nft_internal to accept image_url
+-- Artsorbit — Update mint_nft_internal to accept image_url
 -- Run AFTER storage.sql
 -- ============================================================
 

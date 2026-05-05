@@ -11,7 +11,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "NFTX — Premium Digital Art Marketplace",
+  title: "Artsorbit — Premium Digital Art Marketplace",
   description:
     "Discover, collect, and trade premium digital art and NFTs. The home of top creators and rare collections.",
 };

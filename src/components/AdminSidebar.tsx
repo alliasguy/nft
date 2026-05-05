@@ -115,7 +115,7 @@ export default function AdminSidebar() {
         {/* ── Header ── */}
         <div className="adm-sidebar-header">
           <p className="adm-sidebar-title">⚙ Admin Console</p>
-          <p className="adm-sidebar-sub">NFTX Platform v1.0</p>
+          <p className="adm-sidebar-sub">Artsorbit Platform v1.0</p>
         </div>
 
         {/* ── Nav ── */}

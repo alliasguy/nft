@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Security Patch
+-- Artsorbit — Security Patch
 -- Run in Supabase SQL Editor
 -- ============================================================
 -- Fixes:

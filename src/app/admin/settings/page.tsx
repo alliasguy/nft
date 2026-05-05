@@ -191,7 +191,7 @@ export default function PlatformSettingsPage() {
             </div>
             <p className="adm-hint" style={{ marginTop:"0.5rem" }}>
               Enter the full 42-character Ethereum address (starting with 0x). Only you have access to
-              the private key — NFTX never holds funds directly.
+              the private key — Artsorbit never holds funds directly.
             </p>
           </div>
 

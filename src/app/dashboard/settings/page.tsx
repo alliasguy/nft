@@ -195,7 +195,7 @@ export default function SettingsPage() {
                 onChange={(e) => setHandle(e.target.value.replace(/^@/, ""))}
                 placeholder="your_handle"
               />
-              <p className="db-hint">nftx.io/u/{handle || "your_handle"}</p>
+              <p className="db-hint">artsorbit.com/u/{handle || "your_handle"}</p>
             </div>
           </div>
 
@@ -229,7 +229,7 @@ export default function SettingsPage() {
             <input
               className="db-input"
               type="email"
-              defaultValue={profile ? `${profile.handle}@nftx.io` : ""}
+              defaultValue={profile ? `${profile.handle}@artsorbit.com` : ""}
               disabled
               style={{ opacity:0.6, cursor:"not-allowed" }}
             />

@@ -274,12 +274,11 @@ export default async function Home() {
               </h2>
               <p className="text-body" style={{ maxWidth: "48ch" }}>
                 Upload your artwork, set your price, and reach a global audience of
-                serious collectors — all in under five minutes. Zero platform fees
-                for your first 30 days.
+                serious collectors — all in under five minutes.
               </p>
               <div style={{ display: "flex", gap: "0.875rem", flexWrap: "wrap", justifyContent: "center" }}>
                 <Link href="/create" className="btn btn-gradient btn-lg" style={{ borderRadius: "var(--radius-full)" }}>
-                  Start Minting Free
+                  Start Minting
                 </Link>
                 <Link href="/explore" className="btn btn-secondary btn-lg" style={{ borderRadius: "var(--radius-full)" }}>
                   Browse the Market

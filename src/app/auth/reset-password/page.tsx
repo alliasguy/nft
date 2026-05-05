@@ -89,7 +89,7 @@ export default function ResetPasswordPage() {
             <span style={{ fontWeight:800, fontSize:"1.25rem", letterSpacing:"-0.025em",
               background:"linear-gradient(135deg,#e11d48,#c026d3)",
               WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text" }}>
-              NFTX
+              Artsorbit
             </span>
           </div>
 
@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
                 Set new password
               </h1>
               <p style={{ margin:"0 0 1.75rem", fontSize:"0.9375rem", color:"var(--text-secondary)", lineHeight:1.6 }}>
-                Choose a strong password for your NFTX account.
+                Choose a strong password for your Artsorbit account.
               </p>
 
               {status === "error" && (

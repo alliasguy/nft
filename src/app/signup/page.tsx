@@ -49,7 +49,7 @@ function LogoMark() {
       <span style={{ fontWeight: 800, fontSize: "1.25rem", letterSpacing: "-0.025em",
         background: "linear-gradient(135deg,#e11d48,#c026d3)",
         WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-        NFTX
+        Artsorbit
       </span>
     </Link>
   );
@@ -129,7 +129,7 @@ export default function SignupPage() {
         </div>
         <div className="auth-brand__stat-row">
           {[
-            { v: "Zero fees", l: "First 30 days" },
+            { v: "2%",        l: "Platform fee"  },
             { v: "10%",       l: "Max royalty"   },
             { v: "< 5 min",   l: "To first mint" },
           ].map((s) => (

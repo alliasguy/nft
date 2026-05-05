@@ -1,5 +1,5 @@
 /**
- * Supabase database types for NFTX.
+ * Supabase database types for Artsorbit.
  *
  * These are manually maintained until you run the Supabase CLI generator:
  *   npx supabase gen types typescript --project-id <YOUR_PROJECT_ID> \

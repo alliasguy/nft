@@ -1,5 +1,5 @@
 -- ============================================================
--- NFTX — Purchase & Mint RPC Updates
+-- Artsorbit — Purchase & Mint RPC Updates
 -- Run in Supabase SQL Editor after wallet-system.sql
 -- ============================================================
 

@@ -1,7 +1,7 @@
 import DashboardSidebar from "@/components/DashboardSidebar";
 
 export const metadata = {
-  title: "Dashboard — NFTX",
+  title: "Dashboard — Artsorbit",
 };
 
 export default function DashboardLayout({
