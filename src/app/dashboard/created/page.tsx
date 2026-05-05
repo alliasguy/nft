@@ -8,10 +8,223 @@ import { createClient }        from "@/lib/supabase/client";
 import { rowToCard }           from "@/lib/nftAdapter";
 import type { NFTRow }         from "@/lib/database.types";
 
+const CATEGORIES = ["Art","Music","Photography","Gaming","Virtual Worlds"] as const;
+
+type SaveState = "idle" | "saving" | "saved" | "error";
+
+interface EditForm {
+  title:       string;
+  description: string;
+  price:       string;
+  status:      "buy-now" | "auction";
+  category:    string;
+}
+
+/* ── Inline edit panel ───────────────────────────────────── */
+function EditPanel({
+  nft,
+  onClose,
+  onSaved,
+}: {
+  nft:     NFTRow;
+  onClose: () => void;
+  onSaved: (updated: Partial<NFTRow>) => void;
+}) {
+  const [form, setForm]       = useState<EditForm>({
+    title:       nft.title,
+    description: nft.description ?? "",
+    price:       String(nft.price),
+    status:      (nft.status === "auction" ? "auction" : "buy-now") as EditForm["status"],
+    category:    nft.category,
+  });
+  const [saveState, setSave]  = useState<SaveState>("idle");
+  const [errMsg,    setErr]    = useState("");
+
+  function set(field: keyof EditForm) {
+    return (val: string) => setForm((f) => ({ ...f, [field]: val }));
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    const parsedPrice = parseFloat(form.price);
+    if (!form.title.trim())      { setErr("Title is required."); return; }
+    if (!parsedPrice || parsedPrice <= 0) { setErr("Enter a valid price."); return; }
+
+    setSave("saving");
+    setErr("");
+
+    const sb = createClient() as any;
+    const { error } = await sb
+      .from("nfts")
+      .update({
+        title:       form.title.trim(),
+        description: form.description.trim() || null,
+        price:       parsedPrice,
+        status:      form.status,
+        category:    form.category,
+      })
+      .eq("id", nft.id);
+
+    if (error) {
+      setErr(error.message);
+      setSave("error");
+    } else {
+      setSave("saved");
+      onSaved({
+        title:       form.title.trim(),
+        description: form.description.trim() || null,
+        price:       parsedPrice,
+        status:      form.status,
+        category:    form.category as NFTRow["category"],
+      });
+      setTimeout(() => { setSave("idle"); onClose(); }, 1200);
+    }
+  }
+
+  return (
+    <div style={{
+      marginTop:    "0.5rem",
+      background:   "var(--bg-elevated)",
+      border:       "1px solid var(--accent-border)",
+      borderRadius: "var(--radius-lg)",
+      padding:      "1rem",
+    }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"0.875rem" }}>
+        <p style={{ fontSize:"0.75rem", fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:"var(--accent)" }}>
+          Edit NFT
+        </p>
+        <button
+          onClick={onClose}
+          style={{ background:"none", border:"none", color:"var(--text-muted)", cursor:"pointer", fontSize:"1rem", lineHeight:1, padding:"0.125rem" }}
+          aria-label="Close editor"
+        >
+          ✕
+        </button>
+      </div>
+
+      <form onSubmit={handleSave} style={{ display:"flex", flexDirection:"column", gap:"0.625rem" }}>
+
+        {/* Title */}
+        <div>
+          <label style={{ display:"block", fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)", marginBottom:"0.25rem" }}>
+            Title
+          </label>
+          <input
+            className="db-input"
+            value={form.title}
+            onChange={(e) => set("title")(e.target.value)}
+            placeholder="NFT title"
+            maxLength={80}
+            required
+          />
+        </div>
+
+        {/* Description */}
+        <div>
+          <label style={{ display:"block", fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)", marginBottom:"0.25rem" }}>
+            Description
+          </label>
+          <textarea
+            className="db-textarea"
+            value={form.description}
+            onChange={(e) => set("description")(e.target.value)}
+            placeholder="Describe your artwork…"
+            maxLength={500}
+            rows={2}
+            style={{ minHeight:"4rem" }}
+          />
+        </div>
+
+        {/* Price + Category row */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0.625rem" }}>
+          <div>
+            <label style={{ display:"block", fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)", marginBottom:"0.25rem" }}>
+              Price (ETH)
+            </label>
+            <input
+              className="db-input"
+              type="number" step="0.001" min="0.001"
+              value={form.price}
+              onChange={(e) => set("price")(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label style={{ display:"block", fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)", marginBottom:"0.25rem" }}>
+              Category
+            </label>
+            <select
+              className="select"
+              value={form.category}
+              onChange={(e) => set("category")(e.target.value)}
+              style={{ width:"100%", fontSize:"0.8125rem" }}
+            >
+              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* Sale type */}
+        <div>
+          <label style={{ display:"block", fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)", marginBottom:"0.25rem" }}>
+            Sale Type
+          </label>
+          <div style={{ display:"flex", gap:"0.375rem" }}>
+            {(["buy-now","auction"] as const).map((t) => (
+              <button
+                key={t} type="button"
+                onClick={() => set("status")(t)}
+                style={{
+                  flex:1, padding:"0.4375rem", cursor:"pointer",
+                  fontFamily:"var(--font-sans)", fontSize:"0.75rem", fontWeight:600,
+                  borderRadius:"0.5rem", border:`1.5px solid ${form.status===t ? "var(--accent-border)" : "var(--border)"}`,
+                  background: form.status===t ? "var(--accent-muted)" : "var(--bg-surface)",
+                  color:      form.status===t ? "var(--accent)"       : "var(--text-muted)",
+                  transition:"all 150ms ease",
+                }}
+              >
+                {t === "buy-now" ? "Buy Now" : "Auction"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Error */}
+        {errMsg && (
+          <p style={{ fontSize:"0.8125rem", color:"var(--error)" }}>{errMsg}</p>
+        )}
+
+        {/* Actions */}
+        <div style={{ display:"flex", gap:"0.5rem", marginTop:"0.25rem" }}>
+          <button
+            type="submit"
+            className="db-save-btn"
+            disabled={saveState === "saving" || saveState === "saved"}
+            style={{ flex:1, textAlign:"center", padding:"0.625rem" }}
+          >
+            {saveState === "saving" ? "Saving…" : saveState === "saved" ? "✓ Saved!" : "Save Changes"}
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            style={{ borderRadius:"0.5rem" }}
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+        </div>
+
+      </form>
+    </div>
+  );
+}
+
+/* ── Page ─────────────────────────────────────────────────── */
 export default function CreatedPage() {
   const { userId, loading: profileLoading } = useProfile();
-  const [nfts,    setNfts]    = useState<NFTRow[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [nfts,      setNfts]      = useState<NFTRow[] | null>(null);
+  const [loading,   setLoading]   = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -19,7 +232,6 @@ export default function CreatedPage() {
     const sba = createClient() as any;
     async function load() {
       try {
-        /* 1. All NFTs this user created */
         const { data: created } = await sba
           .from("nfts")
           .select("*")
@@ -29,7 +241,6 @@ export default function CreatedPage() {
 
         if (!created || created.length === 0) { setNfts([]); return; }
 
-        /* 2. Which of those have been sold to someone else? */
         const ids = (created as NFTRow[]).map((n) => n.id);
         const { data: ownership } = await sba
           .from("nft_ownership")
@@ -41,8 +252,6 @@ export default function CreatedPage() {
             .map(({ nft_id, owner_id }) => [nft_id, owner_id])
         );
 
-        /* Keep NFTs where: no ownership record (never sold)
-                         OR ownership record points back to creator */
         const stillOwned = (created as NFTRow[]).filter((n) => {
           const current = ownerMap.get(n.id);
           return !current || current === uid;
@@ -56,7 +265,14 @@ export default function CreatedPage() {
     load();
   }, [userId]);
 
-  const isEmpty = !loading && !profileLoading && nfts !== null && nfts.length === 0;
+  /* Merge saved edits back into local state without a full refetch */
+  function applyEdit(id: string, updates: Partial<NFTRow>) {
+    setNfts((prev) =>
+      prev ? prev.map((n) => (n.id === id ? { ...n, ...updates } : n)) : prev
+    );
+  }
+
+  const isEmpty       = !loading && !profileLoading && nfts !== null && nfts.length === 0;
   const totalEarnings = nfts?.reduce((s, n) => s + Number(n.price), 0).toFixed(2) ?? "0.00";
 
   return (
@@ -81,7 +297,6 @@ export default function CreatedPage() {
 
       <div className="db-page-body">
 
-        {/* Empty state */}
         {isEmpty && (
           <div style={{ textAlign:"center", padding:"5rem 1rem" }}>
             <p style={{ fontSize:"3.5rem", marginBottom:"1rem" }}>🎨</p>
@@ -97,9 +312,9 @@ export default function CreatedPage() {
           </div>
         )}
 
-        {/* Creator stats */}
         {nfts && nfts.length > 0 && (
           <>
+            {/* Stats */}
             <div className="db-stats-grid" style={{ marginBottom:"2rem" }}>
               {[
                 { label:"Total Created",  value: String(nfts.length) },
@@ -114,23 +329,49 @@ export default function CreatedPage() {
               ))}
             </div>
 
-            {/* NFT grid — isOwned shows Sell instead of Buy */}
+            {/* NFT grid */}
             <div className="grid-nft">
               {nfts.map((nft) => (
                 <div key={nft.id} style={{ position:"relative" }}>
+
                   <NFTCard {...rowToCard(nft)} isOwned />
+
+                  {/* Edit button overlay */}
                   <div style={{ position:"absolute", top:"0.75rem", left:"0.75rem", zIndex:3 }}>
                     <button
                       className="btn btn-sm"
-                      style={{ background:"rgba(0,0,0,0.65)", backdropFilter:"blur(8px)", color:"#fff", border:"1px solid rgba(255,255,255,0.15)", borderRadius:"9999px", fontSize:"0.75rem", padding:"0.25rem 0.75rem" }}
+                      style={{
+                        background:    editingId === nft.id ? "var(--accent)" : "rgba(0,0,0,0.65)",
+                        backdropFilter:"blur(8px)",
+                        color:         editingId === nft.id ? "var(--text-inverse)" : "#fff",
+                        border:        `1px solid ${editingId === nft.id ? "var(--accent)" : "rgba(255,255,255,0.15)"}`,
+                        borderRadius:  "9999px",
+                        fontSize:      "0.75rem",
+                        padding:       "0.25rem 0.75rem",
+                        transition:    "all 150ms ease",
+                      }}
+                      onClick={() => setEditingId(editingId === nft.id ? null : nft.id)}
                     >
-                      Edit
+                      {editingId === nft.id ? "✕ Close" : "✎ Edit"}
                     </button>
                   </div>
+
+                  {/* Inline edit panel */}
+                  {editingId === nft.id && (
+                    <EditPanel
+                      nft={nft}
+                      onClose={() => setEditingId(null)}
+                      onSaved={(updates) => {
+                        applyEdit(nft.id, updates);
+                        setEditingId(null);
+                      }}
+                    />
+                  )}
+
                 </div>
               ))}
 
-              {/* Add more card */}
+              {/* Add more */}
               <Link
                 href="/create"
                 style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", aspectRatio:"1", background:"var(--bg-surface)", border:"2px dashed var(--border)", borderRadius:"var(--radius-2xl)", color:"var(--text-muted)", gap:"0.75rem", textDecoration:"none", fontSize:"0.9375rem", fontWeight:600, transition:"border-color 200ms ease, color 200ms ease, background 200ms ease" }}
