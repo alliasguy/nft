@@ -59,10 +59,19 @@ export default function ExplorePage() {
         const { data, error } = await (sb as any)
           .from("nfts")
           .select("*")
+          .eq("mod_status", "approved")    // only admin-approved NFTs
           .order("created_at", { ascending: false })
           .limit(200);
         if (!error && data && data.length > 0) {
-          setAllNfts((data as any[]).map((row) => rowToNftItem(row)));
+          /* User-created NFTs (creator_id IS NOT NULL) always first,
+             then seeded placeholder NFTs — newest-first within each group. */
+          const sorted = [...(data as any[])].sort((a, b) => {
+            const aUser = !!a.creator_id;
+            const bUser = !!b.creator_id;
+            if (aUser !== bUser) return aUser ? -1 : 1;
+            return 0;
+          });
+          setAllNfts(sorted.map((row) => rowToNftItem(row)));
           setIsLive(true);
         }
         // If empty or error → keep mock fallback already in state

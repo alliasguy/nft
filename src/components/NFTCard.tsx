@@ -234,7 +234,12 @@ export default function NFTCard({
 
         {image ? (
           <img src={image} alt={title} loading="lazy"
-            style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 500ms cubic-bezier(0.25,0.46,0.45,0.94)" }} />
+            style={{
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              objectFit: "cover",
+              transition: "transform 500ms cubic-bezier(0.25,0.46,0.45,0.94)",
+            }} />
         ) : (
           <div className="nft-card__art-placeholder" style={{ background: gradient }} aria-hidden />
         )}
@@ -260,13 +265,12 @@ export default function NFTCard({
           ) : null}
         </div>
 
-        {/* Like button */}
+        {/* Like button — CSS class keeps it position:absolute top-right; no inline position override */}
         <button
           className={`nft-card__like${liked ? " nft-card__like--active" : ""}`}
           onClick={handleLike}
           aria-label={liked ? `Unlike ${title}` : `Like ${title}`}
           aria-pressed={liked}
-          style={{ position:"relative", zIndex:1 }}
         >
           <IconHeart filled={liked} />
           <span>{likeCount}</span>

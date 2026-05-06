@@ -2513,8 +2513,8 @@ button {
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  /* overflow on the sidebar itself is hidden — only .db-nav scrolls */
+  overflow: hidden;
   transition: transform var(--t-slow);
 }
 /* Mobile: sidebar is hidden entirely — Navbar hamburger handles navigation */
@@ -2564,10 +2564,12 @@ button {
   color: var(--accent); font-family: var(--font-mono); font-weight: 600;
 }
 
-/* ── Sidebar nav ── */
+/* ── Sidebar nav — scrolls independently so footer always stays visible ── */
 .db-nav {
   padding: 0.75rem;
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
@@ -2596,7 +2598,13 @@ button {
   border: 1px solid var(--accent-border); padding: 0.125rem 0.4375rem;
   border-radius: 9999px; line-height: 1.4;
 }
-.db-sidebar-footer { padding: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.06); flex-shrink: 0; }
+.db-sidebar-footer {
+  padding: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  /* Always visible — not scrolled away with nav items */
+  background: rgba(11, 11, 11, 0.95);
+}
 
 /* ── Mobile toggle FAB ── */
 .db-sidebar-toggle {
@@ -2997,7 +3005,7 @@ button {
   backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
   border-right: 1px solid rgba(254, 228, 64, 0.08);
   display: flex; flex-direction: column;
-  overflow-y: auto; overflow-x: hidden;
+  overflow: hidden;          /* nav scrolls — footer stays fixed */
   transition: transform var(--t-slow);
 }
 /* Mobile: admin sidebar hidden — Navbar hamburger handles navigation */
@@ -3029,7 +3037,7 @@ button {
 .adm-sidebar-sub    { font-size: 0.8125rem; color: var(--text-muted); }
 
 /* ── Sidebar nav — gold active ── */
-.adm-nav { padding: 0.75rem; flex: 1; display: flex; flex-direction: column; gap: 0.125rem; }
+.adm-nav { padding: 0.75rem; flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 0.125rem; }
 .adm-nav__section-label { font-size: 0.625rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); padding: 0.875rem 0.75rem 0.375rem; }
 .adm-nav__link {
   display: flex; align-items: center; gap: 0.75rem;
@@ -3044,7 +3052,12 @@ button {
 .adm-nav__link--active .adm-nav__icon { color: var(--gold); }
 .adm-nav__icon  { width: 1.125rem; height: 1.125rem; flex-shrink: 0; color: var(--text-muted); transition: color var(--t); }
 .adm-nav__badge { margin-left: auto; font-size: 0.625rem; font-weight: 700; background: rgba(254,228,64,0.1); color: var(--gold); border: 1px solid rgba(254,228,64,0.25); padding: 0.125rem 0.4375rem; border-radius: 9999px; line-height: 1.4; }
-.adm-sidebar-footer { padding: 0.75rem; border-top: 1px solid rgba(254,228,64,0.08); flex-shrink: 0; }
+.adm-sidebar-footer {
+  padding: 0.75rem;
+  border-top: 1px solid rgba(254, 228, 64, 0.08);
+  flex-shrink: 0;
+  background: rgba(8, 6, 2, 0.98);
+}
 
 /* Mobile FAB */
 .adm-sidebar-toggle { display: none; position: fixed; bottom: 1.5rem; right: 1rem; z-index: 98; width: 3rem; height: 3rem; border-radius: 50%; background: var(--gradient-gold); border: none; cursor: pointer; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(254,228,64,0.35); transition: transform var(--t-spring), box-shadow var(--t); color: var(--text-inverse); }

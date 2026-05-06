@@ -368,16 +368,30 @@ export default function Navbar() {
           <div style={{ marginTop:"1rem", display:"flex", flexDirection:"column", gap:"0.625rem" }}>
             {authed ? (
               isInApp ? (
-                /* In-app: show wallet balance */
-                <Link
-                  href="/wallet"
-                  className="btn btn-gradient"
-                  style={{ width:"100%", justifyContent:"center", borderRadius:"9999px" }}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <IconWallet/>
-                  Wallet · {balance !== null ? `${balance.toFixed(3)} ETH` : "—"}
-                </Link>
+                /* In-app: wallet balance + sign out */
+                <>
+                  <Link
+                    href="/wallet"
+                    className="btn btn-gradient"
+                    style={{ width:"100%", justifyContent:"center", borderRadius:"9999px" }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <IconWallet/>
+                    Wallet · {balance !== null ? `${balance.toFixed(3)} ETH` : "—"}
+                  </Link>
+                  <button
+                    className="btn btn-secondary"
+                    style={{ width:"100%", justifyContent:"center", borderRadius:"9999px", color:"#f87171", borderColor:"rgba(239,68,68,0.3)" }}
+                    onClick={async () => {
+                      setMenuOpen(false);
+                      const { createClient: cc } = await import("@/lib/supabase/client");
+                      await cc().auth.signOut();
+                      window.location.href = "/login";
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                </>
               ) : (
                 /* Public pages: quiet dashboard link */
                 <Link

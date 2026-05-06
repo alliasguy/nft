@@ -53,20 +53,21 @@ function EditPanel({
     setSave("saving");
     setErr("");
 
-    const sb = createClient() as any;
-    const { error } = await sb
-      .from("nfts")
-      .update({
-        title:       form.title.trim(),
-        description: form.description.trim() || null,
-        price:       parsedPrice,
-        status:      form.status,
-        category:    form.category,
-      })
-      .eq("id", nft.id);
+    /* Use the update_nft_details SECURITY DEFINER RPC.
+       A direct .update() call silently returns error:null but 0 rows
+       updated when RLS blocks it — the RPC is the only reliable path. */
+    const sba = createClient() as any;
+    const { data, error } = await sba.rpc("update_nft_details", {
+      p_nft_id:      nft.id,
+      p_title:       form.title.trim(),
+      p_description: form.description.trim() || null,
+      p_price:       parsedPrice,
+      p_status:      form.status,
+      p_category:    form.category,
+    });
 
-    if (error) {
-      setErr(error.message);
+    if (error || !(data as any)?.success) {
+      setErr((data as any)?.error ?? error?.message ?? "Update failed — you may not have permission to edit this NFT.");
       setSave("error");
     } else {
       setSave("saved");

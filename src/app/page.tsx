@@ -10,24 +10,38 @@ import { ALL_NFTS }    from "@/lib/mockData";
 import { rowToNftItem } from "@/lib/supabaseToNft";
 import type { NFTItem } from "@/lib/mockData";
 
-/* ── Fetch live NFTs, fall back to mock on error/empty ───── */
+/* ── Fetch live NFTs — user-created first, then seeded ───── */
 async function fetchHomeNfts() {
   try {
-    const sb = await createClient();
-    const { data, error } = await (sb as any)
+    const sb  = await createClient();
+    const sba = sb as any;
+
+    /* Approved NFTs only — admin must approve before public display.
+       Sort client-side so user-created NFTs (creator_id IS NOT NULL)
+       appear before seeded placeholder NFTs (creator_id IS NULL). */
+    const { data, error } = await sba
       .from("nfts")
       .select("*")
+      .eq("mod_status", "approved")
       .order("created_at", { ascending: false })
-      .limit(16);
+      .limit(20);
 
-    if (!error && data && (data as any[]).length > 0) {
-      const items: NFTItem[] = (data as any[]).map((r) => rowToNftItem(r));
-      return {
-        hero:     items[0],
-        trending: items.slice(1, 5),
-        newItems: items.length > 5 ? items.slice(5, 9) : items.slice(0, 4),
-      };
-    }
+    if (error || !data || (data as any[]).length === 0) throw new Error("empty");
+
+    /* User-created first, then seeded — within each group keeps DB order */
+    const sorted = [...(data as any[])].sort((a, b) => {
+      const aUser = !!a.creator_id;
+      const bUser = !!b.creator_id;
+      if (aUser !== bUser) return aUser ? -1 : 1;
+      return 0;
+    });
+
+    const items: NFTItem[] = sorted.map((r) => rowToNftItem(r));
+    return {
+      hero:     items[0],
+      trending: items.slice(1, 5),
+      newItems: items.length > 5 ? items.slice(5, 9) : items.slice(0, 4),
+    };
   } catch { /* network error — use mock */ }
 
   return {

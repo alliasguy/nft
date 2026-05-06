@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
-import Navbar from "@/components/Navbar";
+import { Outfit }        from "next/font/google";
+import Navbar            from "@/components/Navbar";
+import GlobalErrorGuard  from "@/components/GlobalErrorGuard";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -22,10 +23,41 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={outfit.variable}>
+    <html
+      lang="en"
+      className={outfit.variable}
+      data-scroll-behavior="smooth"
+    >
+      {/* Suppress browser-extension errors (MetaMask etc.) before Next.js
+          error overlay captures them. Must run synchronously in <head>. */}
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+(function(){
+  function suppress(msg, stack) {
+    return (
+      msg.indexOf('MetaMask') !== -1 ||
+      msg.indexOf('ethereum') !== -1 ||
+      msg.indexOf('web3') !== -1 ||
+      msg.indexOf('Router action dispatched before initialization') !== -1 ||
+      (stack && stack.indexOf('chrome-extension://') !== -1)
+    );
+  }
+  window.addEventListener('unhandledrejection', function(e) {
+    var msg = (e.reason && e.reason.message) ? e.reason.message : String(e.reason || '');
+    var stk = (e.reason && e.reason.stack) ? e.reason.stack : '';
+    if (suppress(msg, stk)) e.preventDefault();
+  }, true);
+  window.addEventListener('error', function(e) {
+    if (e.message && suppress(e.message, e.filename || '')) e.preventDefault();
+  }, true);
+})();
+        `}} />
+      </head>
       <body>
+        {/* Suppresses browser-extension unhandled rejections (e.g. MetaMask)
+            and guards against router-not-ready errors during HMR in dev */}
+        <GlobalErrorGuard />
         <Navbar />
-        {/* Push page content below the fixed navbar */}
         <div style={{ paddingTop: "var(--nav-height)" }}>
           {children}
         </div>
