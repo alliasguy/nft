@@ -11,11 +11,7 @@ const LINKS: Record<string, { label: string; href: string; external?: true }[]> 
     { label: "Hot Collections", href: "/collections"                },
   ],
   Resources: [
-    { label: "Help Center",     href: "#" },
-    { label: "Blog & Research", href: "#" },
-    { label: "Documentation",   href: "#" },
-    { label: "Developers API",  href: "#" },
-    { label: "Brand Kit",       href: "#" },
+    { label: "Help Center", href: "/help" },
   ],
   Community: [
     { label: "Discord",         href: "#", external: true },
