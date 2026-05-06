@@ -40,7 +40,17 @@ export default function AdminWithdrawalsPage() {
     const ok  = !res.error && (res.data as any)?.success;
     setMsg({ id, ok, text: ok ? "Marked as completed. Balance deducted." : (res.data as any)?.error ?? res.error?.message ?? "Failed" });
     setWorking(null);
-    if (ok) load();
+    if (ok) {
+      const req = requests.find((r) => r.id === id);
+      if (req) {
+        fetch("/api/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "withdrawal-completed", userId: req.user_id, amount: String(req.amount), toAddress: req.to_address }),
+        }).catch(() => {});
+      }
+      load();
+    }
   }
 
   async function reject(id: string) {
@@ -50,7 +60,17 @@ export default function AdminWithdrawalsPage() {
     const ok  = !res.error && (res.data as any)?.success;
     setMsg({ id, ok, text: ok ? "Withdrawal rejected." : (res.data as any)?.error ?? res.error?.message ?? "Failed" });
     setWorking(null);
-    if (ok) load();
+    if (ok) {
+      const req = requests.find((r) => r.id === id);
+      if (req) {
+        fetch("/api/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "withdrawal-rejected", userId: req.user_id, amount: String(req.amount), note: noteMap[id] ?? "" }),
+        }).catch(() => {});
+      }
+      load();
+    }
   }
 
   const pendingCount = requests.filter((r) => r.status === "pending").length;

@@ -137,7 +137,7 @@ function EditPanel({
         </div>
 
         {/* Price + Category row */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0.625rem" }}>
+        <div className="edit-row-2col">
           <div>
             <label style={{ display:"block", fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)", marginBottom:"0.25rem" }}>
               Price (ETH)

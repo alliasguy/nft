@@ -97,6 +97,13 @@ export default function SignupPage() {
         setStatus("idle");
         return;
       }
+
+      /* Notify admin — fire-and-forget, errors ignored */
+      fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "new-user", userName: name, userEmail: email }),
+      }).catch(() => {});
     } else {
       /* ── Demo / no-Supabase fallback ── */
       await new Promise((r) => setTimeout(r, 1100));

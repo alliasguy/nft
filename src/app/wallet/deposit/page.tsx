@@ -61,6 +61,18 @@ export default function DepositPage() {
       setErrorMsg(error.message);
     } else {
       setStatus("success");
+      /* Notify user + admin — fire-and-forget */
+      fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type:      "deposit-submitted",
+          userEmail: user.email ?? "",
+          userName:  (user.user_metadata?.name as string) ?? "User",
+          amount,
+          txHash:    txHash.trim(),
+        }),
+      }).catch(() => {});
     }
   }
 

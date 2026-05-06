@@ -965,7 +965,8 @@ button {
   border-top: 1px solid transparent;
 }
 .navbar__mobile-menu--open {
-  max-height: 520px;
+  max-height: calc(100dvh - var(--nav-height));
+  overflow-y: auto;
   border-top-color: var(--border-muted);
 }
 .navbar__mobile-menu__inner {
@@ -3166,4 +3167,14 @@ button {
 .adm-bar { flex: 1; border-radius: 2px 2px 0 0; min-height: 4px; opacity: 0.75; transition: opacity var(--t), transform var(--t); background: var(--gradient-gold); }
 .adm-bar:hover { opacity: 1; transform: scaleY(1.03); transform-origin: bottom; }
 .adm-bar--accent { background: var(--gradient-accent); }
+
+/* ── Edit-panel responsive grid ─────────────────────────────── */
+.edit-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+@media (max-width: 480px) {
+  .edit-row-2col { grid-template-columns: 1fr; }
+}
 

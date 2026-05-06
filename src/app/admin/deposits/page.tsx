@@ -40,7 +40,17 @@ export default function AdminDepositsPage() {
     const ok  = !res.error && (res.data as any)?.success;
     setMsg({ id, ok, text: ok ? "Deposit approved and balance credited." : (res.data as any)?.error ?? res.error?.message ?? "Failed" });
     setWorking(null);
-    if (ok) load();
+    if (ok) {
+      const dep = deposits.find((d) => d.id === id);
+      if (dep) {
+        fetch("/api/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "deposit-approved", userId: dep.user_id, amount: String(dep.amount) }),
+        }).catch(() => {});
+      }
+      load();
+    }
   }
 
   async function reject(id: string) {
@@ -50,7 +60,17 @@ export default function AdminDepositsPage() {
     const ok  = !res.error && (res.data as any)?.success;
     setMsg({ id, ok, text: ok ? "Deposit rejected." : (res.data as any)?.error ?? res.error?.message ?? "Failed" });
     setWorking(null);
-    if (ok) load();
+    if (ok) {
+      const dep = deposits.find((d) => d.id === id);
+      if (dep) {
+        fetch("/api/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "deposit-rejected", userId: dep.user_id, amount: String(dep.amount), note: noteMap[id] ?? "" }),
+        }).catch(() => {});
+      }
+      load();
+    }
   }
 
   const counts = {
