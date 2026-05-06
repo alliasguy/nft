@@ -35,11 +35,26 @@ function base(content: string) {
 export async function sendEmail({
   to, subject, html,
 }: { to: string; subject: string; html: string }) {
-  if (!process.env.RESEND_API_KEY) return; // not configured — skip silently
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[email] RESEND_API_KEY not set — skipping email to", to);
+    return;
+  }
   try {
-    await resend.emails.send({ from: FROM_EMAIL, to, subject, html });
-  } catch {
-    // Email failure must never break the main flow
+    /* Resend SDK v2+ uses a result pattern: returns { data, error }
+       rather than throwing. Must check result.error explicitly. */
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject,
+      html,
+    });
+    if (error) {
+      console.error("[email] Resend rejected the send request:", error);
+    } else {
+      console.log("[email] Sent successfully →", to, "| id:", (data as any)?.id);
+    }
+  } catch (err) {
+    console.error("[email] Unexpected error sending to", to, err);
   }
 }
 
