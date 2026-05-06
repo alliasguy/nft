@@ -271,8 +271,26 @@ export default function ExplorePage() {
             </div>
           </div>
 
-          {/* grid or empty state */}
-          {filtered.length === 0 ? (
+          {/* Skeleton grid while Supabase fetch is in flight */}
+          {dataLoading && (
+            <div className="grid-nft">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="nft-card" style={{ pointerEvents: "none" }}>
+                  <div className="nft-card__media">
+                    <div className="skeleton" style={{ position: "absolute", inset: 0 }} />
+                  </div>
+                  <div className="nft-card__body" style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                    <div className="skeleton" style={{ height: "0.75rem", width: "40%", borderRadius: "0.25rem" }} />
+                    <div className="skeleton" style={{ height: "1rem",   width: "70%", borderRadius: "0.25rem" }} />
+                    <div className="skeleton" style={{ height: "0.875rem", width: "50%", borderRadius: "0.25rem", marginTop: "0.25rem" }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* grid or empty state — shown once fetch resolves */}
+          {!dataLoading && filtered.length === 0 && (
             <div style={{ textAlign: "center", padding: "5rem 1rem", color: "var(--text-muted)" }}>
               <p style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>🔍</p>
               <p className="text-title" style={{ marginBottom: "0.5rem", color: "var(--text-secondary)" }}>
@@ -283,7 +301,9 @@ export default function ExplorePage() {
                 Clear All Filters
               </button>
             </div>
-          ) : (
+          )}
+
+          {!dataLoading && filtered.length > 0 && (
             <div className="grid-nft stagger">
               {filtered.map((nft) => (
                 <NFTCard

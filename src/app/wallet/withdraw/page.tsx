@@ -43,16 +43,21 @@ export default function WithdrawPage() {
     const { data: { user } } = await sb.auth.getUser();
     if (!user) { setStatus("error"); setErrorMsg("Not authenticated."); return; }
 
-    const { error } = await (sb.from("withdrawal_requests") as any).insert({
-      user_id:    user.id,
-      amount:     parsedAmount,
-      to_address: toAddress.trim(),
+    /* Use RPC — deducts balance immediately so funds are locked until
+       admin processes externally. No balance check at approval time. */
+    const { data, error } = await (sb as any).rpc("request_withdrawal", {
+      p_amount:     parsedAmount,
+      p_to_address: toAddress.trim(),
     });
 
-    if (error) {
+    if (error || !(data as any)?.success) {
       setStatus("error");
-      setErrorMsg(error.message);
+      setErrorMsg((data as any)?.error ?? error?.message ?? "Request failed.");
     } else {
+      /* Update displayed balance to reflect the lock */
+      if ((data as any).new_balance !== undefined) {
+        setBalance((data as any).new_balance);
+      }
       setStatus("success");
       /* Notify user + admin — fire-and-forget */
       fetch("/api/email", {

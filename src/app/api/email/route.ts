@@ -34,13 +34,17 @@ async function getTargetUser(userId: string): Promise<{ email: string; name: str
 }
 
 export async function POST(req: Request) {
-  /* Verify the caller has a valid Supabase session */
-  const sb = await createClient();
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
   const body = await req.json() as Record<string, string>;
   const { type } = body;
+
+  /* new-user fires immediately after signUp() — the session cookie may not
+     be established yet, so we skip the auth check for this notification type.
+     It only sends to the admin and carries no sensitive privileged action. */
+  if (type !== "new-user") {
+    const sb = await createClient();
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   switch (type) {
     /* ── User-triggered ───────────────────────────────────────── */

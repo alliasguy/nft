@@ -4,21 +4,29 @@ import SectionHeading  from "@/components/SectionHeading";
 import TopSellers      from "@/components/TopSellers";
 import Footer          from "@/components/Footer";
 import ScrollReveal    from "@/components/ScrollReveal";
-import { GenesisBloom } from "@/components/ArtworkSVG";
 import { createClient } from "@/lib/supabase/server";
 import { ALL_NFTS }    from "@/lib/mockData";
 import { rowToNftItem } from "@/lib/supabaseToNft";
 import type { NFTItem } from "@/lib/mockData";
 
-/* ── Fetch live NFTs — user-created first, then seeded ───── */
+/* UUID pattern — 8-4-4-4-12 hex digits */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/* ── Fetch live NFTs — respects admin-chosen featured hero ── */
 async function fetchHomeNfts() {
   try {
     const sb  = await createClient();
     const sba = sb as any;
 
-    /* Approved NFTs only — admin must approve before public display.
-       Sort client-side so user-created NFTs (creator_id IS NOT NULL)
-       appear before seeded placeholder NFTs (creator_id IS NULL). */
+    /* Read admin-chosen featured NFT id (may be empty string) */
+    const { data: featSetting } = await sba
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "featured_nft_id")
+      .maybeSingle();
+    const featuredId: string = featSetting?.value ?? "";
+
+    /* Fetch all approved NFTs */
     const { data, error } = await sba
       .from("nfts")
       .select("*")
@@ -37,10 +45,23 @@ async function fetchHomeNfts() {
     });
 
     const items: NFTItem[] = sorted.map((r) => rowToNftItem(r));
+
+    /* Use admin-chosen hero if it's valid and exists in the list */
+    let hero     = items[0];
+    let restItems = items.slice(1);
+
+    if (UUID_RE.test(featuredId)) {
+      const featIdx = items.findIndex((n) => n.id === featuredId);
+      if (featIdx !== -1) {
+        hero      = items[featIdx];
+        restItems = items.filter((_, i) => i !== featIdx);
+      }
+    }
+
     return {
-      hero:     items[0],
-      trending: items.slice(1, 5),
-      newItems: items.length > 5 ? items.slice(5, 9) : items.slice(0, 4),
+      hero,
+      trending: restItems.slice(0, 4),
+      newItems: restItems.length > 4 ? restItems.slice(4, 8) : restItems.slice(0, 4),
     };
   } catch { /* network error — use mock */ }
 
@@ -130,8 +151,16 @@ export default async function Home() {
                 </div>
 
                 {/* Artwork — clicking navigates to the detail page */}
-                <Link href={`/nft/${HERO_NFT.id}`} className="featured-card__artwork" style={{ display: "block" }}>
-                  <GenesisBloom />
+                <Link href={`/nft/${HERO_NFT.id}`} className="featured-card__artwork" style={{ display: "block", position: "relative" }}>
+                  {HERO_NFT.image_url ? (
+                    <img
+                      src={HERO_NFT.image_url}
+                      alt={HERO_NFT.title}
+                      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  ) : (
+                    <div style={{ position: "absolute", inset: 0, background: gradient(HERO_NFT) }} />
+                  )}
                 </Link>
 
                 <div className="featured-card__info">

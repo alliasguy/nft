@@ -33,11 +33,23 @@ export interface SupabaseTrait {
 }
 
 export interface SupabaseBid {
-  bidder_name:     string;
-  bidder_gradient: string | null;
-  amount:          number;
-  usd_value:       string | null;
-  created_at:      string;
+  amount:     number;
+  status:     string;
+  created_at: string;
+  profiles: { name: string } | null;
+}
+
+/* Deterministic gradient from a display name — used for bid history avatars */
+export function nameGradient(name: string): string {
+  const palette: [string, string][] = [
+    ["#00f5d4","#f15bb5"],
+    ["#fee440","#e11d48"],
+    ["#3b82f6","#8b5cf6"],
+    ["#10b981","#0ea5e9"],
+    ["#f59e0b","#ef4444"],
+  ];
+  const [a, b] = palette[(name.charCodeAt(0) || 0) % palette.length];
+  return `linear-gradient(135deg, ${a}, ${b})`;
 }
 
 /* ── Main mapper ─────────────────────────────────────────── */
@@ -51,14 +63,17 @@ export function rowToNftItem(
     .map(({ label, value, rarity }) => ({ label, value, rarity }));
 
   const mappedBids: Bid[] = [...bids]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .map((b) => ({
-      bidder:   b.bidder_name,
-      amount:   String(b.amount),
-      usd:      b.usd_value ?? estimateUsd(b.amount),
-      time:     timeAgo(b.created_at),
-      gradient: b.bidder_gradient ?? "linear-gradient(135deg,#333,#555)",
-    }));
+    .sort((a, b) => b.amount - a.amount)
+    .map((b) => {
+      const bidderName = b.profiles?.name ?? "Anonymous";
+      return {
+        bidder:   bidderName,
+        amount:   String(b.amount),
+        usd:      estimateUsd(b.amount),
+        time:     timeAgo(b.created_at),
+        gradient: nameGradient(bidderName),
+      };
+    });
 
   return {
     id:          row.id,

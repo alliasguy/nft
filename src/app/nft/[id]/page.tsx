@@ -2,6 +2,7 @@ import { notFound }    from "next/navigation";
 import Link             from "next/link";
 import ArtworkSVG       from "@/components/ArtworkSVG";
 import BuySection       from "@/components/BuySection";
+import ViewTracker      from "@/components/ViewTracker";
 import { createClient } from "@/lib/supabase/server";
 import { ALL_NFTS }     from "@/lib/mockData";
 import {
@@ -85,7 +86,8 @@ export default async function NFTDetailPage({
   const supabaseId = isUUID(id) ? id : mockIdToUUID(id);
 
   /* ── 2. Try Supabase first ── */
-  let nft = null as ReturnType<typeof rowToNftItem> | null;
+  let nft       = null as ReturnType<typeof rowToNftItem> | null;
+  let creatorId = null as string | null;
 
   if (supabaseId) {
     try {
@@ -93,10 +95,20 @@ export default async function NFTDetailPage({
       const sba = sb as any;
       const [rowRes, traitRes, bidRes] = await Promise.all([
         sba.from("nfts").select("*").eq("id", supabaseId).single(),
-        sba.from("nft_traits").select("*").eq("nft_id", supabaseId).order("display_order"),
-        sba.from("bids").select("*").eq("nft_id", supabaseId).order("created_at", { ascending: false }),
+        sba.from("nft_traits")
+          .select("*")
+          .eq("nft_id", supabaseId)
+          .order("display_order"),
+        /* Fetch pending + accepted bids with bidder name for the activity section */
+        sba.from("nft_bids")
+          .select("amount, status, created_at, profiles(name)")
+          .eq("nft_id", supabaseId)
+          .in("status", ["pending","accepted"])
+          .order("amount", { ascending: false })
+          .limit(20),
       ]);
       if (rowRes.data) {
+        creatorId = (rowRes.data as any).creator_id ?? null;
         nft = rowToNftItem(
           rowRes.data,
           (traitRes.data ?? []) as SupabaseTrait[],
@@ -127,6 +139,9 @@ export default async function NFTDetailPage({
 
   return (
     <div className="container">
+      {/* Track this page view — only for real DB-backed NFTs, not mock/seeded ones */}
+      {isUUID(id) && supabaseId && <ViewTracker nftId={supabaseId} />}
+
       {/* ── Back breadcrumb ── */}
       <div style={{ paddingTop: "clamp(1.5rem,4vw,2.5rem)" }}>
         <Link href="/explore" className="btn btn-ghost btn-sm"
@@ -256,7 +271,6 @@ export default async function NFTDetailPage({
           <div className="detail-section">
             <BuySection
               nftId={
-                /* Real UUID → pass through; short mock ID ("1"–"16") → pad to seeded UUID */
                 /^[0-9a-f]{8}-/i.test(id)
                   ? id
                   : `00000000-0000-0000-0000-${String(Math.max(1, parseInt(id, 10) || 1)).padStart(12, "0")}`
@@ -266,6 +280,7 @@ export default async function NFTDetailPage({
               usd={usd}
               isAuction={isAuction}
               initialLikes={likes}
+              creatorId={creatorId}
             />
           </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Link                      from "next/link";
 import { createClient }          from "@/lib/supabase/client";
 
@@ -96,6 +96,17 @@ export default function NFTCard({
   isOwned  = false,
 }: NFTCardProps) {
   const nftUUID = extractNftUUID(href);
+
+  /* Image fade-in: starts hidden, revealed on load.
+     useRef + useEffect handles the cached-image race condition where the
+     browser fires the load event synchronously before React attaches onLoad. */
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+      setImgLoaded(true);
+    }
+  }, [image]);
 
   /* Like state */
   const [liked,     setLiked]     = useState(false);
@@ -233,13 +244,24 @@ export default function NFTCard({
       <div className="nft-card__media">
 
         {image ? (
-          <img src={image} alt={title} loading="lazy"
-            style={{
-              position: "absolute", inset: 0,
-              width: "100%", height: "100%",
-              objectFit: "cover",
-              transition: "transform 500ms cubic-bezier(0.25,0.46,0.45,0.94)",
-            }} />
+          <>
+            {!imgLoaded && (
+              <div className="skeleton" style={{ position: "absolute", inset: 0 }} aria-hidden />
+            )}
+            <img
+              ref={imgRef}
+              src={image}
+              alt={title}
+              onLoad={() => setImgLoaded(true)}
+              style={{
+                position: "absolute", inset: 0,
+                width: "100%", height: "100%",
+                objectFit: "cover",
+                opacity: imgLoaded ? 1 : 0,
+                transition: "opacity 250ms ease, transform 500ms cubic-bezier(0.25,0.46,0.45,0.94)",
+              }}
+            />
+          </>
         ) : (
           <div className="nft-card__art-placeholder" style={{ background: gradient }} aria-hidden />
         )}
