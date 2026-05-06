@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit }        from "next/font/google";
+import Script            from "next/script";
 import Navbar            from "@/components/Navbar";
 import GlobalErrorGuard  from "@/components/GlobalErrorGuard";
 import "./globals.css";
@@ -61,6 +62,24 @@ export default function RootLayout({
         <div style={{ paddingTop: "var(--nav-height)" }}>
           {children}
         </div>
+
+        {/* Smartsupp live chat */}
+        <Script
+          id="smartsupp"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+var _smartsupp = _smartsupp || {};
+_smartsupp.key = 'dffe19a0ba6b1150557e2918ba598680057a5699';
+window.smartsupp||(function(d) {
+  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+  c.type='text/javascript';c.charset='utf-8';c.async=true;
+  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+})(document);
+            `,
+          }}
+        />
       </body>
     </html>
   );
