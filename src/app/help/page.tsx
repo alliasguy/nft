@@ -286,7 +286,14 @@ export default function HelpPage() {
           <p style={{ fontSize: "0.9375rem", color: "var(--text-secondary)", lineHeight: 1.7,
             marginBottom: "1rem" }}>
             Our support team is available via live chat (click the chat bubble in the
-            bottom-right corner) or by email.
+            bottom-right corner) or by email at{" "}
+            <a href="mailto:support@artsorbit.com"
+              style={{ color: "var(--accent)", fontWeight: 600 }}>
+              support@artsorbit.com
+            </a>.
+          </p>
+          <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", marginBottom: "1.25rem", lineHeight: 1.6 }}>
+            Artsorbit, Inc. · 130 Jackson Blvd Suite 1910-A · Chicago, IL 60604 · United States
           </p>
           <a href="mailto:support@artsorbit.com"
             style={{ display: "inline-block", padding: "0.625rem 1.5rem",

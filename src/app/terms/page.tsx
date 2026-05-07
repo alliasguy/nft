@@ -261,6 +261,12 @@ export default function TermsPage() {
               support@artsorbit.com
             </a>
           </P>
+          <P>
+            <strong style={{ color: "var(--text-primary)" }}>Artsorbit, Inc.</strong><br />
+            130 Jackson Blvd Suite 1910-A<br />
+            Chicago, IL 60604<br />
+            United States
+          </P>
         </Section>
 
         <div style={{ marginTop: "3rem", paddingTop: "1.5rem",

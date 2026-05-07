@@ -159,9 +159,18 @@ export default function Footer() {
 
         {/* ── Bottom bar ── */}
         <div className="footer__bottom">
-          <p className="footer__copyright">
-            © {year} Artsorbit, Inc. All rights reserved.
-          </p>
+          <div>
+            <p className="footer__copyright">
+              © {year} Artsorbit, Inc. All rights reserved.
+            </p>
+            <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
+              130 Jackson Blvd Suite 1910-A, Chicago, IL 60604, US &nbsp;·&nbsp;{" "}
+              <a href="mailto:support@artsorbit.com"
+                style={{ color: "var(--text-muted)", textDecoration: "none" }}>
+                support@artsorbit.com
+              </a>
+            </p>
+          </div>
           <ul className="footer__legal">
             {[
               { label: "Privacy Policy",   href: "/privacy" },
