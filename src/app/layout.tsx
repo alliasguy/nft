@@ -32,47 +32,41 @@ export default function RootLayout({
           error overlay captures them. Must run synchronously in <head>. */}
       <head>
         <script dangerouslySetInnerHTML={{ __html: `
-(function(){
-  /* ── MetaMask / extension error suppression ── */
-  function suppress(msg, stack) {
-    if (!msg) return false;
-    var s = stack || '';
-    return (
-      msg.indexOf('MetaMask') !== -1 ||
-      msg.indexOf('ethereum') !== -1 ||
-      msg.indexOf('web3') !== -1 ||
-      msg.indexOf('Failed to connect') !== -1 ||
-      msg.indexOf('Router action dispatched before initialization') !== -1 ||
-      s.indexOf('chrome-extension://') !== -1 ||
-      s.indexOf('inpage.js') !== -1
-    );
-  }
-  window.addEventListener('unhandledrejection', function(e) {
-    var msg = (e.reason && e.reason.message) ? e.reason.message : String(e.reason || '');
-    var stk = (e.reason && e.reason.stack) ? e.reason.stack : '';
-    if (suppress(msg, stk)) e.preventDefault();
-  }, true);
-  window.addEventListener('error', function(e) {
-    var stk = (e.error && e.error.stack) ? e.error.stack : (e.filename || '');
-    if (suppress(e.message, stk)) e.preventDefault();
-  }, true);
-  var _ce = console.error.bind(console);
-  console.error = function() {
-    var msg = Array.prototype.slice.call(arguments).join(' ');
-    if (suppress(msg, msg)) return;
-    _ce.apply(console, arguments);
-  };
+/* Smartsupp — top-level scope so _smartsupp and smartsupp become true globals */
+var _smartsupp = _smartsupp || {};
+_smartsupp.key = 'dffe19a0ba6b1150557e2918ba598680057a5699';
+window.smartsupp||(function(d) {
+  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+  c.type='text/javascript';c.charset='utf-8';c.async=true;
+  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+})(document);
 
-  /* ── Smartsupp live chat — must use window._smartsupp (not a local var)
-     so the async loader can read the key from the global scope ── */
-  window._smartsupp = window._smartsupp || {};
-  window._smartsupp.key = 'dffe19a0ba6b1150557e2918ba598680057a5699';
-  window.smartsupp||(function(d) {
-    var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
-    s=d.getElementsByTagName('script')[0];c=d.createElement('script');
-    c.type='text/javascript';c.charset='utf-8';c.async=true;
-    c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
-  })(document);
+/* MetaMask / extension error suppression — IIFE keeps its helpers local */
+(function(){
+  function suppress(msg,stack){
+    if(!msg)return false;
+    var s=stack||'';
+    return msg.indexOf('MetaMask')!==-1||msg.indexOf('ethereum')!==-1||
+           msg.indexOf('web3')!==-1||msg.indexOf('Failed to connect')!==-1||
+           msg.indexOf('Router action dispatched before initialization')!==-1||
+           s.indexOf('chrome-extension://')!==-1||s.indexOf('inpage.js')!==-1;
+  }
+  window.addEventListener('unhandledrejection',function(e){
+    var msg=(e.reason&&e.reason.message)?e.reason.message:String(e.reason||'');
+    var stk=(e.reason&&e.reason.stack)?e.reason.stack:'';
+    if(suppress(msg,stk))e.preventDefault();
+  },true);
+  window.addEventListener('error',function(e){
+    var stk=(e.error&&e.error.stack)?e.error.stack:(e.filename||'');
+    if(suppress(e.message,stk))e.preventDefault();
+  },true);
+  var _ce=console.error.bind(console);
+  console.error=function(){
+    var msg=Array.prototype.slice.call(arguments).join(' ');
+    if(suppress(msg,msg))return;
+    _ce.apply(console,arguments);
+  };
 })();
         `}} />
       </head>
