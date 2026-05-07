@@ -173,8 +173,8 @@ export default function TermsPage() {
           <P>
             <strong style={{ color: "var(--text-primary)" }}>Platform fee:</strong> Artsorbit
             charges a{" "}
-            <strong style={{ color: "var(--text-primary)" }}>2% fee</strong> on every sale.
-            The seller receives the sale price minus this fee.
+            <strong style={{ color: "var(--text-primary)" }}>no platform fee</strong> on sales.
+            Artists and sellers receive 100% of the sale price.
           </P>
           <P>
             <strong style={{ color: "var(--text-primary)" }}>Auctions and bids:</strong> For
@@ -223,7 +223,7 @@ export default function TermsPage() {
         <Section title="9. Fees Summary">
           <Ul>
             <Li>Minting fee: 0.15 ETH per NFT (configurable by admin)</Li>
-            <Li>Platform fee on sales: 2% of the sale price</Li>
+            <Li>Platform fee on sales: None — sellers receive 100% of the sale price</Li>
             <Li>Deposits: free to submit; no processing fee</Li>
             <Li>Withdrawals: no fee charged by Artsorbit (network gas fees apply externally)</Li>
           </Ul>

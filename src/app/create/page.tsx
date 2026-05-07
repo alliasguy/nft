@@ -577,9 +577,9 @@ export default function CreatePage() {
               </div>
               {parsedPrice > 0 && (
                 <p className="db-hint">
-                  You receive ≈ <strong style={{ color:"var(--text-primary)" }}>
-                    {(parsedPrice * 0.98).toFixed(4)} ETH
-                  </strong> after 2% platform fee.
+                  You receive <strong style={{ color:"var(--text-primary)" }}>
+                    {parsedPrice.toFixed(4)} ETH
+                  </strong> — artists keep 100% of the sale price.
                 </p>
               )}
             </div>

@@ -107,7 +107,7 @@ DECLARE
   v_amount     numeric;
   v_bidder_bal numeric;
   v_owner      uuid;
-  v_fee_pct    numeric := 2;
+  v_fee_pct    numeric := 0;
   v_fee        numeric;
   v_net        numeric;
 BEGIN
@@ -138,7 +138,7 @@ BEGIN
   END IF;
 
   -- Read platform fee
-  SELECT COALESCE(NULLIF(value,''),'2')::numeric INTO v_fee_pct
+  SELECT COALESCE(NULLIF(value,''),'0')::numeric INTO v_fee_pct
   FROM platform_settings WHERE key = 'platform_fee_pct';
   v_fee := v_amount * (v_fee_pct / 100);
   v_net := v_amount - v_fee;

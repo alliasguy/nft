@@ -19,7 +19,7 @@ INSERT INTO platform_settings (key, value) VALUES
   ('deposit_wallet_address', ''),   -- admin fills this in Settings
   ('minting_fee_eth',        '0.15'),
   ('min_withdrawal_eth',     '0.01'),
-  ('platform_fee_pct',       '2')
+  ('platform_fee_pct',       '0')
 ON CONFLICT (key) DO NOTHING;
 
 ALTER TABLE platform_settings ENABLE ROW LEVEL SECURITY;

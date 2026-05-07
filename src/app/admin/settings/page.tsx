@@ -54,7 +54,7 @@ export default function PlatformSettingsPage() {
   const [settings,  setSettings]  = useState<Settings>({
     deposit_wallet_address: "",
     minting_fee_eth:        "0.15",
-    platform_fee_pct:       "2",
+    platform_fee_pct:       "0",
     min_withdrawal_eth:     "0.01",
   });
   const [loading, setLoading] = useState(true);
@@ -275,7 +275,7 @@ export default function PlatformSettingsPage() {
               <div style={{ display:"flex", flexDirection:"column", gap:"0.25rem" }}>
                 {[
                   { label:"Buyer pays",      val:"1.000 ETH" },
-                  { label:"Platform fee",    val:`${(1 * parseFloat(settings.platform_fee_pct||"0") / 100).toFixed(4)} ETH  (${settings.platform_fee_pct}%)` },
+                  { label:"Platform fee",    val:`${(1 * parseFloat(settings.platform_fee_pct||"0") / 100).toFixed(4)} ETH (${settings.platform_fee_pct}%)` },
                   { label:"Seller receives", val:`${(1 - 1 * parseFloat(settings.platform_fee_pct||"0") / 100).toFixed(4)} ETH` },
                 ].map(({ label, val }) => (
                   <div key={label} style={{ display:"flex", justifyContent:"space-between" }}>

@@ -13,7 +13,7 @@ DECLARE
   v_total_vol    NUMERIC;
   v_vol_24h      NUMERIC;
   v_vol_prev_24h NUMERIC;
-  v_fee_pct      NUMERIC := 2;
+  v_fee_pct      NUMERIC := 0;
   v_new_nfts_24h INTEGER;
   v_pending_dep  INTEGER;
 BEGIN

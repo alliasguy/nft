@@ -277,9 +277,7 @@ export default function BuySection({
     }
   }
 
-  /* ── Fee preview ── */
-  const fee   = (parseFloat(price) * 0.02).toFixed(3);
-  const total = (parseFloat(price) * 1.02).toFixed(3);
+  /* No platform fee — artists receive 100% of the sale price */
 
   /* ═══════════════════════════════════════════════════════
      RENDER
@@ -528,10 +526,9 @@ export default function BuySection({
             <p className="buy-box__usd">≈ ${usd} USD</p>
             <div style={{ background:"var(--bg-overlay)", borderRadius:"var(--radius-md)", padding:"0.875rem 1rem", marginBottom:"1.125rem", display:"flex", flexDirection:"column", gap:"0.5rem" }}>
               {[
-                { label:"Item price",        val:`${price} ETH` },
-                { label:"Platform fee (2%)", val:`${fee} ETH`  },
-                { label:"Seller receives",   val:`${(parseFloat(price)*0.98).toFixed(3)} ETH` },
-                { label:"You pay",           val:`${total} ETH`, bold:true },
+                { label:"You pay",             val:`${price} ETH`, bold:true },
+                { label:"Artist receives",     val:`${price} ETH (100%)`     },
+                { label:"Platform fee",        val:"None"                    },
               ].map(({ label, val, bold }) => (
                 <div key={label} style={{ display:"flex", justifyContent:"space-between" }}>
                   <span style={{ fontSize:"0.875rem", color:"var(--text-muted)" }}>{label}</span>
@@ -541,7 +538,7 @@ export default function BuySection({
             </div>
             <div className="buy-box__actions">
               <button className="btn btn-gradient btn-lg" style={{ justifyContent:"center" }} onClick={confirmPurchase}>
-                Confirm — {total} ETH
+                Confirm — {price} ETH
               </button>
               <button className="btn btn-secondary btn-lg" style={{ justifyContent:"center" }} onClick={() => setBuyState("idle")}>
                 Cancel

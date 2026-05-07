@@ -59,7 +59,7 @@ DECLARE
   v_uid          UUID    := auth.uid();
   v_buyer_bal    NUMERIC;
   v_seller_id    UUID;
-  v_fee_pct      NUMERIC := 2;
+  v_fee_pct      NUMERIC := 0;
   v_fee          NUMERIC;
   v_net          NUMERIC;
   v_nft_title    TEXT;
@@ -111,7 +111,7 @@ BEGIN
   p_price := v_listed_price;
 
   -- ── Fetch platform fee ────────────────────────────────────
-  SELECT COALESCE(NULLIF(value,''),'2')::NUMERIC INTO v_fee_pct
+  SELECT COALESCE(NULLIF(value,''),'0')::NUMERIC INTO v_fee_pct
   FROM platform_settings WHERE key = 'platform_fee_pct';
 
   -- ── Lock and read buyer balance ───────────────────────────

@@ -150,7 +150,7 @@ export default function HelpPage() {
                   <p>Browse the <Link href="/explore" style={{ color: "var(--accent)" }}>Explore</Link> page and click on any NFT to open its detail page. If it is listed as <strong style={{ color: "var(--text-primary)" }}>Buy Now</strong>:</p>
                   <ol style={{ paddingLeft: "1.25rem", listStyle: "decimal", display: "flex", flexDirection: "column", gap: "0.25rem" }}>
                     <li>Click <strong style={{ color: "var(--text-primary)" }}>Buy for X ETH</strong>.</li>
-                    <li>Review the fee breakdown (item price + 2% platform fee).</li>
+                    <li>Review the confirmation — you pay the exact listed price, no fees added.</li>
                     <li>Click <strong style={{ color: "var(--text-primary)" }}>Confirm</strong> to complete the purchase.</li>
                   </ol>
                   <p>The NFT is added to your <Link href="/dashboard/collected" style={{ color: "var(--accent)" }}>Collected</Link> tab immediately.</p>
@@ -191,11 +191,11 @@ export default function HelpPage() {
             },
             {
               q: "How do I accept a bid on my auction NFT?",
-              a: <p>Open the NFT detail page for your auction-listed NFT. You will see all incoming bids ranked highest-first. Click <strong style={{ color: "var(--text-primary)" }}>✓ Accept</strong> next to the bid you want to accept. The transaction completes instantly — the buyer&rsquo;s balance is debited, your balance is credited (minus 2% platform fee), and ownership transfers to the buyer.</p>,
+              a: <p>Open the NFT detail page for your auction-listed NFT. You will see all incoming bids ranked highest-first. Click <strong style={{ color: "var(--text-primary)" }}>✓ Accept</strong> next to the bid you want to accept. The transaction completes instantly — the buyer&rsquo;s balance is debited, your full balance is credited, and ownership transfers to the buyer.</p>,
             },
             {
               q: "How much do I receive when I sell?",
-              a: <p>You receive the sale price minus the <strong style={{ color: "var(--text-primary)" }}>2% Artsorbit platform fee</strong>. For example, a 1 ETH sale nets you 0.98 ETH. The fee is shown in the confirmation screen before any transaction completes.</p>,
+              a: <p>You receive <strong style={{ color: "var(--text-primary)" }}>100% of the sale price</strong>. Artsorbit charges no platform fee on sales — a 1 ETH sale nets you exactly 1 ETH.</p>,
             },
           ]} />
         </div>
@@ -260,7 +260,7 @@ export default function HelpPage() {
                   padding: "0.875rem 1.125rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                   {[
                     { label: "Minting fee",         value: "0.15 ETH per NFT" },
-                    { label: "Platform fee (sales)", value: "2% of sale price"  },
+                    { label: "Platform fee (sales)", value: "None — artists keep 100%" },
                     { label: "Deposits",             value: "Free"              },
                     { label: "Withdrawals",          value: "Free (Artsorbit charges no fee; external network gas fees apply)" },
                   ].map(({ label, value }) => (
