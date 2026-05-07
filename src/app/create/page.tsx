@@ -123,7 +123,7 @@ export default function CreatePage() {
 
   /* Wallet / fee */
   const [balance,  setBalance]  = useState<number | null>(null);
-  const [mintFee,  setMintFee]  = useState(0.05);
+  const [mintFee,  setMintFee]  = useState(0.15);
   const [loading,  setLoading]  = useState(true);
 
   /* Mode: generate art or upload file */
@@ -166,7 +166,7 @@ export default function CreatePage() {
         sba.from("platform_settings").select("value").eq("key", "minting_fee_eth").single(),
       ]);
       if (profRes.data)  setBalance((profRes.data as any).balance ?? 0);
-      if (feeRes.data)   setMintFee(parseFloat((feeRes.data as any).value) || 0.05);
+      if (feeRes.data)   setMintFee(parseFloat((feeRes.data as any).value) || 0.15);
       setLoading(false);
     }
     load();

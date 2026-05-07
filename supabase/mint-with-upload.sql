@@ -34,7 +34,7 @@ RETURNS JSON LANGUAGE plpgsql SECURITY DEFINER AS $$
 DECLARE
   v_uid        UUID    := auth.uid();
   v_balance    NUMERIC;
-  v_mint_fee   NUMERIC := 0.05;
+  v_mint_fee   NUMERIC := 0.15;
   v_nft_id     UUID;
   v_handle     TEXT;
   v_name       TEXT;
@@ -44,7 +44,7 @@ BEGIN
     RETURN json_build_object('success',false,'error','Not authenticated');
   END IF;
 
-  SELECT COALESCE(NULLIF(value,''),'0.05')::NUMERIC INTO v_mint_fee
+  SELECT COALESCE(NULLIF(value,''),'0.15')::NUMERIC INTO v_mint_fee
   FROM platform_settings WHERE key = 'minting_fee_eth';
 
   SELECT balance, handle, name INTO v_balance, v_handle, v_name

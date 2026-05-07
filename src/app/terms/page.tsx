@@ -154,7 +154,7 @@ export default function TermsPage() {
           </Ul>
           <P>
             A minting fee (displayed at the time of minting, currently{" "}
-            <strong style={{ color: "var(--text-primary)" }}>0.05 ETH</strong>) is deducted
+            <strong style={{ color: "var(--text-primary)" }}>0.15 ETH</strong>) is deducted
             from your internal balance when you mint. This fee is non-refundable.
           </P>
           <P>
@@ -222,7 +222,7 @@ export default function TermsPage() {
 
         <Section title="9. Fees Summary">
           <Ul>
-            <Li>Minting fee: 0.05 ETH per NFT (configurable by admin)</Li>
+            <Li>Minting fee: 0.15 ETH per NFT (configurable by admin)</Li>
             <Li>Platform fee on sales: 2% of the sale price</Li>
             <Li>Deposits: free to submit; no processing fee</Li>
             <Li>Withdrawals: no fee charged by Artsorbit (network gas fees apply externally)</Li>

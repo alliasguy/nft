@@ -53,7 +53,7 @@ export default function PlatformSettingsPage() {
   /* Live settings from Supabase */
   const [settings,  setSettings]  = useState<Settings>({
     deposit_wallet_address: "",
-    minting_fee_eth:        "0.05",
+    minting_fee_eth:        "0.15",
     platform_fee_pct:       "2",
     min_withdrawal_eth:     "0.01",
   });

@@ -213,7 +213,7 @@ export default function HelpPage() {
                     <li>Upload an image or audio file (optional — if omitted, a generated artwork is used).</li>
                     <li>Collection name and sale type (Buy Now or Auction).</li>
                   </ul>
-                  <p>A minting fee of <strong style={{ color: "var(--text-primary)" }}>0.05 ETH</strong> is deducted from your balance when you mint.</p>
+                  <p>A minting fee of <strong style={{ color: "var(--text-primary)" }}>0.15 ETH</strong> is deducted from your balance when you mint.</p>
                 </div>
               ),
             },
@@ -259,7 +259,7 @@ export default function HelpPage() {
                 <div style={{ background: "var(--bg-elevated)", borderRadius: "var(--radius-lg)",
                   padding: "0.875rem 1.125rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                   {[
-                    { label: "Minting fee",         value: "0.05 ETH per NFT" },
+                    { label: "Minting fee",         value: "0.15 ETH per NFT" },
                     { label: "Platform fee (sales)", value: "2% of sale price"  },
                     { label: "Deposits",             value: "Free"              },
                     { label: "Withdrawals",          value: "Free (Artsorbit charges no fee; external network gas fees apply)" },

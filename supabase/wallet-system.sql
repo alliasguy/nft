@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS platform_settings (
 
 INSERT INTO platform_settings (key, value) VALUES
   ('deposit_wallet_address', ''),   -- admin fills this in Settings
-  ('minting_fee_eth',        '0.05'),
+  ('minting_fee_eth',        '0.15'),
   ('min_withdrawal_eth',     '0.01'),
   ('platform_fee_pct',       '2')
 ON CONFLICT (key) DO NOTHING;
