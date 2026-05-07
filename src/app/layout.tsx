@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Outfit }        from "next/font/google";
 import Navbar            from "@/components/Navbar";
 import GlobalErrorGuard  from "@/components/GlobalErrorGuard";
-import SmartsuppChat     from "@/components/SmartsuppChat";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -34,6 +33,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: `
 (function(){
+  /* ── MetaMask / extension error suppression ── */
   function suppress(msg, stack) {
     if (!msg) return false;
     var s = stack || '';
@@ -47,28 +47,31 @@ export default function RootLayout({
       s.indexOf('inpage.js') !== -1
     );
   }
-
-  /* Unhandled promise rejections (MetaMask async failures) */
   window.addEventListener('unhandledrejection', function(e) {
     var msg = (e.reason && e.reason.message) ? e.reason.message : String(e.reason || '');
     var stk = (e.reason && e.reason.stack) ? e.reason.stack : '';
     if (suppress(msg, stk)) e.preventDefault();
   }, true);
-
-  /* Synchronous errors thrown by extensions */
   window.addEventListener('error', function(e) {
     var stk = (e.error && e.error.stack) ? e.error.stack : (e.filename || '');
     if (suppress(e.message, stk)) e.preventDefault();
   }, true);
-
-  /* Patch console.error — Turbopack reads this to populate the overlay.
-     MetaMask calls console.error when connection fails, bypassing event listeners. */
   var _ce = console.error.bind(console);
   console.error = function() {
     var msg = Array.prototype.slice.call(arguments).join(' ');
     if (suppress(msg, msg)) return;
     _ce.apply(console, arguments);
   };
+
+  /* ── Smartsupp live chat — official inline install ── */
+  var _smartsupp = _smartsupp || {};
+  _smartsupp.key = 'dffe19a0ba6b1150557e2918ba598680057a5699';
+  window.smartsupp||(function(d) {
+    var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+    s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+    c.type='text/javascript';c.charset='utf-8';c.async=true;
+    c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+  })(document);
 })();
         `}} />
       </head>
@@ -81,8 +84,6 @@ export default function RootLayout({
           {children}
         </div>
 
-        {/* Smartsupp live chat */}
-        <SmartsuppChat />
       </body>
     </html>
   );

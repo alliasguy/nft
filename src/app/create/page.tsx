@@ -276,8 +276,7 @@ export default function CreatePage() {
           <div style={{ fontSize:"3rem", marginBottom:"1rem" }}>🎨</div>
           <h2 className="text-headline" style={{ marginBottom:"0.625rem" }}>NFT Minted!</h2>
           <p style={{ color:"var(--text-secondary)", marginBottom:"2rem", lineHeight:1.65 }}>
-            <strong style={{ color:"var(--text-primary)" }}>{title}</strong> is now live on the marketplace.
-            Minting fee of <strong>{mintFee} ETH</strong> was deducted.
+            <strong style={{ color:"var(--text-primary)" }}>{title}</strong> is now live on the marketplace pending admin review.
           </p>
           {previewUrl && (
             <img src={previewUrl} alt={title} style={{ width:"140px", height:"140px", objectFit:"cover",
@@ -596,12 +595,12 @@ export default function CreatePage() {
             >
               {mintStatus === "uploading" ? "Uploading file…"
                : mintStatus === "minting"   ? "Minting NFT…"
-               : !enoughBalance             ? `Insufficient Balance (need ${mintFee} ETH)`
-               : `Mint NFT — ${mintFee} ETH fee`}
+               : !enoughBalance             ? "Insufficient Balance"
+               : "Mint NFT"}
             </button>
 
             <p style={{ fontSize:"0.8125rem", color:"var(--text-muted)", textAlign:"center" }}>
-              The {mintFee} ETH fee is deducted from your{" "}
+              A minting fee will be deducted from your{" "}
               <Link href="/wallet" style={{ color:"var(--accent)" }}>internal wallet</Link>.
             </p>
 
