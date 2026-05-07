@@ -32,8 +32,18 @@ export default function GlobalErrorGuard() {
     }
 
     function handleError(event: ErrorEvent) {
-      const msg = event.message ?? "";
-      if (msg.includes("Router action dispatched before initialization")) {
+      const msg   = event.message ?? "";
+      const stack = (event.error as Error | null)?.stack ?? event.filename ?? "";
+
+      const isExtension =
+        msg.includes("MetaMask") ||
+        msg.includes("ethereum") ||
+        msg.includes("web3") ||
+        msg.includes("Failed to connect") ||
+        stack.includes("chrome-extension://") ||
+        stack.includes("inpage.js");
+
+      if (isExtension || msg.includes("Router action dispatched before initialization")) {
         event.preventDefault();
       }
     }
