@@ -13,19 +13,25 @@ export default function DepositPage() {
   const [status,        setStatus]        = useState<"idle"|"submitting"|"success"|"error">("idle");
   const [errorMsg,      setErrorMsg]      = useState("");
   const [balance,       setBalance]       = useState<number | null>(null);
+  const [userName,      setUserName]      = useState("");
+  const [userEmail,     setUserEmail]     = useState("");
 
   useEffect(() => {
     const sb = createClient();
     async function load() {
       const { data: { user } } = await sb.auth.getUser();
       if (!user) { window.location.href = "/login?next=/wallet/deposit"; return; }
+      setUserEmail(user.email ?? "");
       const sba = sb as any;
       const [settingsRes, profRes] = await Promise.all([
         sba.from("platform_settings").select("value").eq("key", "deposit_wallet_address").single(),
-        sba.from("profiles").select("balance").eq("id", user.id).single(),
+        sba.from("profiles").select("balance, name").eq("id", user.id).single(),
       ]);
       if (settingsRes.data) setDepositWallet((settingsRes.data as any).value ?? "");
-      if (profRes.data)     setBalance((profRes.data as any).balance ?? 0);
+      if (profRes.data) {
+        setBalance((profRes.data as any).balance ?? 0);
+        setUserName((profRes.data as any).name ?? "");
+      }
     }
     load();
   }, []);
@@ -67,8 +73,8 @@ export default function DepositPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type:      "deposit-submitted",
-          userEmail: user.email ?? "",
-          userName:  (user.user_metadata?.name as string) ?? "User",
+          userEmail: userEmail,
+          userName:  userName || userEmail.split("@")[0] || "User",
           amount,
           txHash:    txHash.trim(),
         }),

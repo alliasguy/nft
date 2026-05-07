@@ -12,6 +12,16 @@ import type { NFTItem } from "@/lib/mockData";
 /* UUID pattern — 8-4-4-4-12 hex digits */
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/* Fisher-Yates shuffle — server-safe (runs once per request, not cached) */
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 /* ── Fetch live NFTs — respects admin-chosen featured hero ── */
 async function fetchHomeNfts() {
   try {
@@ -26,28 +36,20 @@ async function fetchHomeNfts() {
       .maybeSingle();
     const featuredId: string = featSetting?.value ?? "";
 
-    /* Fetch all approved NFTs */
+    /* Fetch approved NFTs — newest first (DB handles ordering) */
     const { data, error } = await sba
       .from("nfts")
       .select("*")
       .eq("mod_status", "approved")
       .order("created_at", { ascending: false })
-      .limit(20);
+      .limit(40);
 
     if (error || !data || (data as any[]).length === 0) throw new Error("empty");
 
-    /* User-created first, then seeded — within each group keeps DB order */
-    const sorted = [...(data as any[])].sort((a, b) => {
-      const aUser = !!a.creator_id;
-      const bUser = !!b.creator_id;
-      if (aUser !== bUser) return aUser ? -1 : 1;
-      return 0;
-    });
+    const items: NFTItem[] = (data as any[]).map((r) => rowToNftItem(r));
 
-    const items: NFTItem[] = sorted.map((r) => rowToNftItem(r));
-
-    /* Use admin-chosen hero if it's valid and exists in the list */
-    let hero     = items[0];
+    /* Hero: admin-chosen or newest approved NFT */
+    let hero      = items[0];
     let restItems = items.slice(1);
 
     if (UUID_RE.test(featuredId)) {
@@ -58,17 +60,23 @@ async function fetchHomeNfts() {
       }
     }
 
-    return {
-      hero,
-      trending: restItems.slice(0, 4),
-      newItems: restItems.length > 4 ? restItems.slice(4, 8) : restItems.slice(0, 4),
-    };
+    /* New Items = 4 most recently created (restItems already newest-first from DB) */
+    const newItems = restItems.slice(0, 4);
+
+    /* Trending = shuffled random selection from the remaining pool.
+       If fewer than 4 remain after new items, pull from the full rest list. */
+    const trendingPool = restItems.slice(4).length >= 4
+      ? restItems.slice(4)
+      : restItems;
+    const trending = shuffle(trendingPool).slice(0, 4);
+
+    return { hero, trending, newItems };
   } catch { /* network error — use mock */ }
 
   return {
     hero:     ALL_NFTS[0],
-    trending: ALL_NFTS.slice(1, 5),
-    newItems: ALL_NFTS.slice(5, 9),
+    trending: shuffle([...ALL_NFTS.slice(1)]).slice(0, 4),
+    newItems: ALL_NFTS.slice(0, 4),
   };
 }
 

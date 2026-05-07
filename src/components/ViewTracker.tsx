@@ -25,13 +25,15 @@ export default function ViewTracker({ nftId }: { nftId: string }) {
     }
 
     const sb = createClient();
-    sb.auth.getSession().then(({ data: { session } }) => {
-      // Logged-in users use their user_id; guests use the random viewer ID
-      const hash = session?.user?.id ?? viewerId!;
-      (sb as any)
-        .rpc("record_nft_view", { p_nft_id: nftId, p_viewer_hash: hash })
-        .catch(() => {});
-    });
+    (async () => {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        const hash = session?.user?.id ?? viewerId!;
+        await (sb as any).rpc("record_nft_view", { p_nft_id: nftId, p_viewer_hash: hash });
+      } catch {
+        /* fire-and-forget — view tracking must never break the page */
+      }
+    })();
   }, [nftId]);
 
   return null;

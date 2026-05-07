@@ -11,18 +11,24 @@ export default function WithdrawPage() {
   const [toAddress,  setToAddress]  = useState("");
   const [status,     setStatus]     = useState<"idle"|"submitting"|"success"|"error">("idle");
   const [errorMsg,   setErrorMsg]   = useState("");
+  const [userName,   setUserName]   = useState("");
+  const [userEmail,  setUserEmail]  = useState("");
 
   useEffect(() => {
     const sb = createClient();
     async function load() {
       const { data: { user } } = await sb.auth.getUser();
       if (!user) { window.location.href = "/login?next=/wallet/withdraw"; return; }
+      setUserEmail(user.email ?? "");
       const sba = sb as any;
       const [profRes, settingsRes] = await Promise.all([
-        sba.from("profiles").select("balance").eq("id", user.id).single(),
+        sba.from("profiles").select("balance, name").eq("id", user.id).single(),
         sba.from("platform_settings").select("value").eq("key", "min_withdrawal_eth").single(),
       ]);
-      if (profRes.data)     setBalance((profRes.data as any).balance ?? 0);
+      if (profRes.data) {
+        setBalance((profRes.data as any).balance ?? 0);
+        setUserName((profRes.data as any).name ?? "");
+      }
       if (settingsRes.data) setMinWd(parseFloat((settingsRes.data as any).value) || 0.01);
     }
     load();
@@ -65,8 +71,8 @@ export default function WithdrawPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type:      "withdrawal-submitted",
-          userEmail: user.email ?? "",
-          userName:  (user.user_metadata?.name as string) ?? "User",
+          userEmail: userEmail,
+          userName:  userName || userEmail.split("@")[0] || "User",
           amount,
           toAddress: toAddress.trim(),
         }),
