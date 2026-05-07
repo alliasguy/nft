@@ -86,8 +86,9 @@ export default async function NFTDetailPage({
   const supabaseId = isUUID(id) ? id : mockIdToUUID(id);
 
   /* ── 2. Try Supabase first ── */
-  let nft       = null as ReturnType<typeof rowToNftItem> | null;
-  let creatorId = null as string | null;
+  let nft        = null as ReturnType<typeof rowToNftItem> | null;
+  let creatorId  = null as string | null;
+  let royaltyPct = 0;
 
   if (supabaseId) {
     try {
@@ -108,7 +109,8 @@ export default async function NFTDetailPage({
           .limit(20),
       ]);
       if (rowRes.data) {
-        creatorId = (rowRes.data as any).creator_id ?? null;
+        creatorId  = (rowRes.data as any).creator_id  ?? null;
+        royaltyPct = (rowRes.data as any).royalty_pct ?? 0;
         nft = rowToNftItem(
           rowRes.data,
           (traitRes.data ?? []) as SupabaseTrait[],
@@ -281,6 +283,7 @@ export default async function NFTDetailPage({
               isAuction={isAuction}
               initialLikes={likes}
               creatorId={creatorId}
+              royaltyPct={royaltyPct}
             />
           </div>
 

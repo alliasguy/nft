@@ -106,7 +106,7 @@ export default function ExplorePage() {
       case "most-viewed": return [...items].sort((a, b) => b.views - a.views);
       default:            return items;
     }
-  }, [category, statuses, maxPrice, sort]);
+  }, [category, statuses, maxPrice, sort, allNfts]);
 
   /* ── category item counts ── */
   const counts = useMemo(() => {

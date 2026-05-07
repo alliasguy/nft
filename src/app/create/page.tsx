@@ -148,6 +148,7 @@ export default function CreatePage() {
   const [saleStatus,  setSaleStatus] = useState<"buy-now"|"auction">("buy-now");
   const [price,       setPrice]      = useState("");
   const [collection,  setCollection] = useState("");
+  const [royalty,     setRoyalty]    = useState(0);  // 0–10 %
 
   /* Submit */
   const [mintStatus, setMintStatus] = useState<MintStatus>("idle");
@@ -256,6 +257,7 @@ export default function CreatePage() {
       p_status:          saleStatus,
       p_collection_name: collection.trim() || null,
       p_image_url:       imageUrl,
+      p_royalty_pct:     royalty,
     });
 
     if (error || !(data as any)?.success) {
@@ -581,6 +583,34 @@ export default function CreatePage() {
                   </strong> — artists keep 100% of the sale price.
                 </p>
               )}
+            </div>
+
+            <div className="db-field">
+              <label className="db-label">
+                Creator Royalty (%)
+                <span style={{ fontWeight:400, color:"var(--text-muted)", marginLeft:"0.375rem" }}>
+                  — earned on every resale
+                </span>
+              </label>
+              <div style={{ display:"flex", alignItems:"center", gap:"0.875rem" }}>
+                <input
+                  type="range"
+                  min="0" max="10" step="0.5"
+                  value={royalty}
+                  onChange={(e) => setRoyalty(parseFloat(e.target.value))}
+                  style={{ flex:1, accentColor:"var(--accent)" }}
+                />
+                <span style={{ fontSize:"1rem", fontWeight:800, color:"var(--accent)",
+                  minWidth:"2.5rem", textAlign:"right" }}>
+                  {royalty}%
+                </span>
+              </div>
+              <p className="db-hint">
+                {royalty === 0
+                  ? "No royalty — you receive nothing on future resales."
+                  : `Each time this NFT is resold, you automatically receive ${royalty}% of the sale price.`}
+                {" "}Max 10%.
+              </p>
             </div>
 
             {errorMsg && (

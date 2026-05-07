@@ -63,9 +63,10 @@ export default function RootLayout({
     _ce.apply(console, arguments);
   };
 
-  /* ── Smartsupp live chat — official inline install ── */
-  var _smartsupp = _smartsupp || {};
-  _smartsupp.key = 'dffe19a0ba6b1150557e2918ba598680057a5699';
+  /* ── Smartsupp live chat — must use window._smartsupp (not a local var)
+     so the async loader can read the key from the global scope ── */
+  window._smartsupp = window._smartsupp || {};
+  window._smartsupp.key = 'dffe19a0ba6b1150557e2918ba598680057a5699';
   window.smartsupp||(function(d) {
     var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
     s=d.getElementsByTagName('script')[0];c=d.createElement('script');

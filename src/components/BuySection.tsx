@@ -13,6 +13,7 @@ interface BuySectionProps {
   isAuction:    boolean;
   initialLikes: number;
   creatorId?:   string | null;
+  royaltyPct?:  number;
 }
 
 interface BidRow {
@@ -48,6 +49,7 @@ type BidStatus = "idle" | "placing" | "placed" | "withdrawing" | "error";
 
 export default function BuySection({
   nftId, nftTitle, price, usd, isAuction, initialLikes, creatorId,
+  royaltyPct = 0,
 }: BuySectionProps) {
   /* ── Shared state ── */
   const [liked,        setLiked]        = useState(false);
@@ -525,16 +527,20 @@ export default function BuySection({
             </div>
             <p className="buy-box__usd">≈ ${usd} USD</p>
             <div style={{ background:"var(--bg-overlay)", borderRadius:"var(--radius-md)", padding:"0.875rem 1rem", marginBottom:"1.125rem", display:"flex", flexDirection:"column", gap:"0.5rem" }}>
-              {[
-                { label:"You pay",             val:`${price} ETH`, bold:true },
-                { label:"Artist receives",     val:`${price} ETH (100%)`     },
-                { label:"Platform fee",        val:"None"                    },
-              ].map(({ label, val, bold }) => (
-                <div key={label} style={{ display:"flex", justifyContent:"space-between" }}>
-                  <span style={{ fontSize:"0.875rem", color:"var(--text-muted)" }}>{label}</span>
-                  <span style={{ fontSize:"0.875rem", fontWeight: bold ? 700 : 400, color: bold ? "var(--text-primary)" : "var(--text-secondary)" }}>{val}</span>
-                </div>
-              ))}
+              {([
+                { label:"You pay",          val:`${price} ETH`, bold:true },
+                royaltyPct > 0
+                  ? { label:`Creator royalty (${royaltyPct}%)`, val:`${(parseFloat(price) * royaltyPct / 100).toFixed(4)} ETH` }
+                  : null,
+                { label:"Platform fee",    val:"None" },
+              ] as ({ label:string; val:string; bold?:boolean } | null)[])
+                .filter(Boolean)
+                .map((row) => (
+                  <div key={row!.label} style={{ display:"flex", justifyContent:"space-between" }}>
+                    <span style={{ fontSize:"0.875rem", color:"var(--text-muted)" }}>{row!.label}</span>
+                    <span style={{ fontSize:"0.875rem", fontWeight: row!.bold ? 700 : 400, color: row!.bold ? "var(--text-primary)" : "var(--text-secondary)" }}>{row!.val}</span>
+                  </div>
+                ))}
             </div>
             <div className="buy-box__actions">
               <button className="btn btn-gradient btn-lg" style={{ justifyContent:"center" }} onClick={confirmPurchase}>
