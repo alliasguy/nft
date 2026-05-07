@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit }        from "next/font/google";
 import Navbar            from "@/components/Navbar";
 import GlobalErrorGuard  from "@/components/GlobalErrorGuard";
+import SmartsuppChat     from "@/components/SmartsuppChat";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -32,17 +33,6 @@ export default function RootLayout({
           error overlay captures them. Must run synchronously in <head>. */}
       <head>
         <script dangerouslySetInnerHTML={{ __html: `
-/* Smartsupp — top-level scope so _smartsupp and smartsupp become true globals */
-var _smartsupp = _smartsupp || {};
-_smartsupp.key = 'dffe19a0ba6b1150557e2918ba598680057a5699';
-window.smartsupp||(function(d) {
-  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
-  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
-  c.type='text/javascript';c.charset='utf-8';c.async=true;
-  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
-})(document);
-
-/* MetaMask / extension error suppression — IIFE keeps its helpers local */
 (function(){
   function suppress(msg,stack){
     if(!msg)return false;
@@ -78,6 +68,7 @@ window.smartsupp||(function(d) {
         <div style={{ paddingTop: "var(--nav-height)" }}>
           {children}
         </div>
+        <SmartsuppChat />
 
       </body>
     </html>
