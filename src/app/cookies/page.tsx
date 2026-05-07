@@ -179,7 +179,7 @@ export default function CookiesPage() {
               Privacy Policy
             </a>
           </p>
-        </Section>
+        </section>
 
         {/* What we do not use */}
         <section style={{ marginBottom: "2.5rem" }}>

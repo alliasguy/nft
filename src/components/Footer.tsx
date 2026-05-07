@@ -164,12 +164,12 @@ export default function Footer() {
           </p>
           <ul className="footer__legal">
             {[
-              { label: "Privacy Policy",   href: "#" },
-              { label: "Terms of Service", href: "#" },
-              { label: "Cookie Settings",  href: "#" },
+              { label: "Privacy Policy",   href: "/privacy" },
+              { label: "Terms of Service", href: "/terms"   },
+              { label: "Cookie Settings",  href: "/cookies" },
             ].map(({ label, href }) => (
               <li key={label}>
-                <a href={href} className="footer__legal-link">{label}</a>
+                <Link href={href} className="footer__legal-link">{label}</Link>
               </li>
             ))}
           </ul>
