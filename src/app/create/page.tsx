@@ -595,7 +595,7 @@ export default function CreatePage() {
               <div style={{ display:"flex", alignItems:"center", gap:"0.875rem" }}>
                 <input
                   type="range"
-                  min="0" max="10" step="0.5"
+                  min="0" max="15" step="0.5"
                   value={royalty}
                   onChange={(e) => setRoyalty(parseFloat(e.target.value))}
                   style={{ flex:1, accentColor:"var(--accent)" }}
@@ -609,7 +609,7 @@ export default function CreatePage() {
                 {royalty === 0
                   ? "No royalty — you receive nothing on future resales."
                   : `Each time this NFT is resold, you automatically receive ${royalty}% of the sale price.`}
-                {" "}Max 10%.
+                {" "}Max 15%.
               </p>
             </div>
 

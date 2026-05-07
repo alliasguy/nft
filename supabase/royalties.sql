@@ -7,7 +7,7 @@
 -- ── 1. Add royalty_pct column ─────────────────────────────
 ALTER TABLE nfts
   ADD COLUMN IF NOT EXISTS royalty_pct NUMERIC(5,2) NOT NULL DEFAULT 0
-  CHECK (royalty_pct >= 0 AND royalty_pct <= 10);
+  CHECK (royalty_pct >= 0 AND royalty_pct <= 15);
 
 -- ── 2. mint_nft_internal — accept royalty_pct ─────────────
 -- Drop all overloads first so the new signature is unambiguous.
@@ -42,7 +42,7 @@ DECLARE
   v_handle     TEXT;
   v_name       TEXT;
   v_token_num  INTEGER;
-  v_royalty    NUMERIC := LEAST(GREATEST(COALESCE(p_royalty_pct, 0), 0), 10);
+  v_royalty    NUMERIC := LEAST(GREATEST(COALESCE(p_royalty_pct, 0), 0), 15);
 BEGIN
   IF v_uid IS NULL THEN
     RETURN json_build_object('success',false,'error','Not authenticated');

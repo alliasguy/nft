@@ -127,7 +127,7 @@ export default function SignupPage() {
         <div className="auth-brand__stat-row">
           {[
             { v: "2%",        l: "Platform fee"  },
-            { v: "10%",       l: "Max royalty"   },
+            { v: "15%",       l: "Max royalty"   },
             { v: "< 5 min",   l: "To first mint" },
           ].map((s) => (
             <div key={s.l}>
