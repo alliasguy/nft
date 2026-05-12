@@ -122,9 +122,9 @@ export default async function Home() {
 
               <div className="hero-stats animate-fade-in-up">
                 {[
-                  { v: "142K+", l: "Artworks"   },
-                  { v: "38.2K", l: "Creators"   },
-                  { v: "$420M", l: "Total Volume"},
+                  { v: "86",    l: "Artworks"   },
+                  { v: "24",    l: "Creators"   },
+                  { v: "$3.2K", l: "Total Volume"},
                 ].map((s) => (
                   <div key={s.l} className="hero-stat">
                     <div className="hero-stat__value">{s.v}</div>

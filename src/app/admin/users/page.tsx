@@ -32,9 +32,14 @@ export default function UsersPage() {
   const [filter,   setFilter]   = useState<UserStatus | "all">("all");
   const [search,   setSearch]   = useState("");
   /* Local overrides for suspend/verify until a proper admin RPC is wired */
-  const [overrides, setOverrides] = useState<Record<string, UserStatus>>({});
-  const [working,   setWorking]   = useState<string | null>(null);
-  const [actionMsg, setActionMsg] = useState<{ id:string; text:string; ok:boolean } | null>(null);
+  const [overrides,    setOverrides]    = useState<Record<string, UserStatus>>({});
+  const [working,      setWorking]      = useState<string | null>(null);
+  const [actionMsg,    setActionMsg]    = useState<{ id:string; text:string; ok:boolean } | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data: { user } }) => setCurrentUserId(user?.id ?? null));
+  }, []);
 
   useEffect(() => {
     const sb = createClient();
@@ -86,6 +91,23 @@ export default function UsersPage() {
       if ((res.data as any)?.success) {
         setOverrides((o) => ({ ...o, [u.id]: "admin" }));
         setActionMsg({ id: u.id, ok: true, text: "User verified." });
+      } else {
+        setActionMsg({ id: u.id, ok: false, text: (res.data as any)?.error ?? "Action failed." });
+      }
+    } catch {
+      setActionMsg({ id: u.id, ok: false, text: "Network error." });
+    }
+    setWorking(null);
+  }
+
+  async function setRole(u: Profile, newRole: "admin" | "user") {
+    setWorking(u.id);
+    try {
+      const sb  = createClient();
+      const res = await (sb as any).rpc("admin_update_user", { p_user_id: u.id, p_role: newRole });
+      if ((res.data as any)?.success) {
+        setOverrides((o) => ({ ...o, [u.id]: newRole }));
+        setActionMsg({ id: u.id, ok: true, text: newRole === "admin" ? "Promoted to admin." : "Demoted to user." });
       } else {
         setActionMsg({ id: u.id, ok: false, text: (res.data as any)?.error ?? "Action failed." });
       }
@@ -212,10 +234,30 @@ export default function UsersPage() {
                                 {working === u.id ? "…" : "✓ Verify"}
                               </button>
                             )}
+                            {st !== "admin" && st !== "suspended" && (
+                              <button
+                                className="adm-btn-approve"
+                                style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem", background:"rgba(254,228,64,0.1)", color:"var(--gold)", borderColor:"rgba(254,228,64,0.3)" }}
+                                disabled={working === u.id}
+                                onClick={() => setRole(u, "admin")}
+                              >
+                                {working === u.id ? "…" : "⚙ Make Admin"}
+                              </button>
+                            )}
+                            {st === "admin" && u.id !== currentUserId && (
+                              <button
+                                className="adm-btn-flag"
+                                style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem" }}
+                                disabled={working === u.id}
+                                onClick={() => setRole(u, "user")}
+                              >
+                                {working === u.id ? "…" : "↩ Remove Admin"}
+                              </button>
+                            )}
                             <button
                               className="adm-btn-flag"
                               style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem" }}
-                              disabled={working === u.id}
+                              disabled={working === u.id || u.id === currentUserId}
                               onClick={() => toggleSuspend(u)}
                             >
                               {working === u.id ? "…" : st === "suspended" ? "↩ Restore" : "⊘ Suspend"}

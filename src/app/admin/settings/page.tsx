@@ -64,6 +64,10 @@ export default function PlatformSettingsPage() {
   const [feeState,    setFeeState]    = useState<SaveState>("idle");
   const [walletError, setWalletError] = useState("");
   const [feeError,    setFeeError]    = useState("");
+  const [pwState,     setPwState]     = useState<SaveState>("idle");
+  const [pwError,     setPwError]     = useState("");
+  const [newPw,       setNewPw]       = useState("");
+  const [confirmPw,   setConfirmPw]   = useState("");
 
   /* Copy-to-clipboard */
   const [copied, setCopied] = useState(false);
@@ -326,6 +330,57 @@ export default function PlatformSettingsPage() {
         {/* ══════════════════════════════════════════════════
             DANGER ZONE
            ══════════════════════════════════════════════════ */}
+        {/* ── Change Password ── */}
+        <div className="adm-settings-card">
+          <p className="adm-settings-card__title">🔒 Change Password</p>
+
+          <div style={{ display:"flex", flexDirection:"column", gap:"1rem", maxWidth:400 }}>
+            <div className="adm-field">
+              <label className="adm-label">New Password</label>
+              <input
+                className="adm-input"
+                type="password"
+                placeholder="Min. 8 characters"
+                value={newPw}
+                onChange={(e) => setNewPw(e.target.value)}
+                autoComplete="new-password"
+              />
+            </div>
+            <div className="adm-field">
+              <label className="adm-label">Confirm New Password</label>
+              <input
+                className="adm-input"
+                type="password"
+                placeholder="Repeat password"
+                value={confirmPw}
+                onChange={(e) => setConfirmPw(e.target.value)}
+                autoComplete="new-password"
+              />
+              {confirmPw && newPw !== confirmPw && (
+                <p className="adm-hint" style={{ color:"var(--error)" }}>Passwords do not match.</p>
+              )}
+            </div>
+          </div>
+
+          {pwError && <p style={{ fontSize:"0.875rem", color:"var(--error)", marginTop:"0.75rem" }}>{pwError}</p>}
+
+          <div style={{ display:"flex", justifyContent:"flex-end", marginTop:"1.25rem" }}>
+            <button
+              className="adm-save-btn"
+              disabled={pwState === "saving" || pwState === "saved" || !newPw || newPw !== confirmPw || newPw.length < 8}
+              onClick={async () => {
+                setPwState("saving"); setPwError("");
+                const { createClient: cc } = await import("@/lib/supabase/client");
+                const { error } = await cc().auth.updateUser({ password: newPw });
+                if (error) { setPwError(error.message); setPwState("error"); }
+                else { setNewPw(""); setConfirmPw(""); setPwState("saved"); setTimeout(() => setPwState("idle"), 2500); }
+              }}
+            >
+              {pwState === "saving" ? "Updating…" : pwState === "saved" ? "✓ Password Updated!" : "Update Password"}
+            </button>
+          </div>
+        </div>
+
         <div className="adm-settings-card adm-settings-card--danger">
           <p className="adm-settings-card__title">⚠️ Danger Zone</p>
           <p style={{ fontSize:"0.9375rem", color:"var(--text-secondary)", marginBottom:"1.25rem", lineHeight:1.65 }}>

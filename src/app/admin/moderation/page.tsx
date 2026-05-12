@@ -26,6 +26,7 @@ interface NftRow {
   badge:            string | null;
   description:      string | null;
   status:           string;
+  likes_count:      number;
 }
 
 const CATEGORIES = ["Art","Music","Photography","Gaming","Virtual Worlds"] as const;
@@ -188,6 +189,8 @@ export default function ModerationPage() {
   const [featuredId,    setFeaturedId]    = useState("");
   const [editingId,     setEditingId]     = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [boostingId,    setBoostingId]    = useState<string | null>(null);
+  const [boostAmount,   setBoostAmount]   = useState("100");
 
   /* ── Load NFTs + featured setting ── */
   const load = useCallback(async () => {
@@ -195,7 +198,7 @@ export default function ModerationPage() {
     const sb = createClient() as any;
     const [nftsRes, featRes] = await Promise.all([
       sb.from("nfts")
-        .select("id,title,description,creator_name,creator_handle,creator_gradient,category,price,art_stop_1,art_stop_2,art_shape,image_url,mod_status,mod_note,created_at,is_live,badge,status")
+        .select("id,title,description,creator_name,creator_handle,creator_gradient,category,price,art_stop_1,art_stop_2,art_shape,image_url,mod_status,mod_note,created_at,is_live,badge,status,likes_count")
         .order("created_at", { ascending: false })
         .limit(200),
       sb.from("platform_settings").select("value").eq("key", "featured_nft_id").maybeSingle(),
@@ -257,6 +260,20 @@ export default function ModerationPage() {
     } else {
       setMsgMap((m) => ({ ...m, [id]: { ok: false, text: (res.data as any)?.error ?? res.error?.message ?? "Delete failed" } }));
     }
+    setWorking(null);
+  }
+
+  /* ── Boost likes ── */
+  async function handleBoost(id: string) {
+    const amount = parseInt(boostAmount, 10);
+    if (!amount || amount < 1) return;
+    setWorking(id);
+    const sb  = createClient() as any;
+    const res = await sb.rpc("admin_boost_likes", { p_nft_id: id, p_amount: amount });
+    const ok  = !res.error && (res.data as any)?.success;
+    setMsgMap((m) => ({ ...m, [id]: { ok, text: ok ? `✓ +${amount} likes added` : (res.data as any)?.error ?? "Boost failed" } }));
+    if (ok) setNfts((prev) => prev.map((n) => n.id === id ? { ...n, likes_count: n.likes_count + amount } : n));
+    setBoostingId(null);
     setWorking(null);
   }
 
@@ -424,9 +441,14 @@ export default function ModerationPage() {
                         </p>
                       )}
 
-                      <p style={{ marginTop:"0.5rem", fontWeight:700, fontSize:"0.875rem", color:"var(--text-primary)" }}>
-                        {Number(nft.price).toFixed(4)} ETH
-                      </p>
+                      <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.5rem" }}>
+                        <p style={{ fontWeight:700, fontSize:"0.875rem", color:"var(--text-primary)" }}>
+                          {Number(nft.price).toFixed(4)} ETH
+                        </p>
+                        <p style={{ fontSize:"0.75rem", color:"var(--text-muted)" }}>
+                          ♥ {nft.likes_count}
+                        </p>
+                      </div>
 
                       {msg && (
                         <p style={{ marginTop:"0.375rem", fontSize:"0.75rem", color: msg.ok ? "#34d399" : "#f87171" }}>
@@ -525,6 +547,37 @@ export default function ModerationPage() {
                         </button>
                       )}
                     </div>
+
+                    {/* ── Boost likes ── */}
+                    {boostingId === nft.id ? (
+                      <div style={{ display:"flex", gap:"0.375rem", padding:"0.5rem", borderTop:"1px solid var(--border-muted)", alignItems:"center" }}>
+                        <input
+                          type="number" min="1" max="10000"
+                          value={boostAmount}
+                          onChange={(e) => setBoostAmount(e.target.value)}
+                          style={{ width:"4.5rem", fontSize:"0.75rem", padding:"0.25rem 0.5rem", background:"var(--bg-elevated)", border:"1px solid var(--border)", borderRadius:"0.375rem", color:"var(--text-primary)", fontFamily:"var(--font-sans)" }}
+                        />
+                        {[50,100,500].map((n) => (
+                          <button key={n} onClick={() => setBoostAmount(String(n))}
+                            style={{ fontSize:"0.625rem", padding:"0.1875rem 0.375rem", background:"var(--bg-overlay)", border:"1px solid var(--border)", borderRadius:"0.25rem", color:"var(--text-muted)", cursor:"pointer" }}>
+                            +{n}
+                          </button>
+                        ))}
+                        <button onClick={() => handleBoost(nft.id)} disabled={working === nft.id}
+                          style={{ marginLeft:"auto", fontSize:"0.6875rem", fontWeight:700, padding:"0.25rem 0.625rem", background:"var(--accent-muted)", border:"1px solid var(--accent-border)", borderRadius:"0.375rem", color:"var(--accent)", cursor:"pointer" }}>
+                          {working === nft.id ? "…" : "Boost"}
+                        </button>
+                        <button onClick={() => setBoostingId(null)}
+                          style={{ fontSize:"0.6875rem", padding:"0.25rem 0.5rem", background:"none", border:"none", color:"var(--text-muted)", cursor:"pointer" }}>✕</button>
+                      </div>
+                    ) : (
+                      <button onClick={() => { setBoostingId(nft.id); setBoostAmount("100"); }}
+                        style={{ width:"100%", padding:"0.4375rem", background:"transparent", border:"none", borderTop:"1px solid var(--border-muted)", cursor:"pointer", fontSize:"0.6875rem", fontWeight:700, fontFamily:"var(--font-sans)", color:"var(--text-muted)", transition:"color 150ms, background 150ms" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color="#f15bb5"; e.currentTarget.style.background="rgba(241,91,181,0.06)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color="var(--text-muted)"; e.currentTarget.style.background="transparent"; }}>
+                        🔥 Boost Likes
+                      </button>
+                    )}
 
                   </div>
 
