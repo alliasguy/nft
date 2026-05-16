@@ -114,7 +114,7 @@ function LoginContent() {
           </p>
         </div>
         <div className="auth-brand__stat-row">
-          {[{ v: "86",    l: "Artworks" }, { v: "$3.2K", l: "Total Volume" }, { v: "24",    l: "Creators" }].map((s) => (
+          {[{ v: "1K+",   l: "Artworks" }, { v: "$3.2K", l: "Total Volume" }, { v: "72",    l: "Creators" }].map((s) => (
             <div key={s.l}>
               <p style={{ fontWeight: 800, fontSize: "1.25rem", letterSpacing: "-0.02em", color: "var(--text-primary)" }}>{s.v}</p>
               <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>{s.l}</p>

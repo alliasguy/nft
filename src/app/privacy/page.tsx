@@ -73,7 +73,6 @@ export default function PrivacyPage() {
             <a href="https://www.artsorbit.com"
               style={{ color: "var(--accent)" }}>www.artsorbit.com</a>.
             We are the data controller for the personal information described in this Policy.
-            Our registered address is 130 Jackson Blvd Suite 1910-A, Chicago, IL 60604, United States.
           </P>
         </Section>
 
@@ -264,12 +263,6 @@ export default function PrivacyPage() {
               style={{ color: "var(--accent)", fontWeight: 600 }}>
               privacy@artsorbit.com
             </a>
-          </P>
-          <P>
-            <strong style={{ color: "var(--text-primary)" }}>Artsorbit, Inc.</strong><br />
-            130 Jackson Blvd Suite 1910-A<br />
-            Chicago, IL 60604<br />
-            United States
           </P>
         </Section>
 

@@ -292,9 +292,6 @@ export default function HelpPage() {
               support@artsorbit.com
             </a>.
           </p>
-          <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", marginBottom: "1.25rem", lineHeight: 1.6 }}>
-            Artsorbit, Inc. · 130 Jackson Blvd Suite 1910-A · Chicago, IL 60604 · United States
-          </p>
           <a href="mailto:support@artsorbit.com"
             style={{ display: "inline-block", padding: "0.625rem 1.5rem",
               background: "var(--gradient-accent)", color: "var(--text-inverse)",

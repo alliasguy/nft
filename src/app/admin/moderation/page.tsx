@@ -271,7 +271,8 @@ export default function ModerationPage() {
     const sb  = createClient() as any;
     const res = await sb.rpc("admin_boost_likes", { p_nft_id: id, p_amount: amount });
     const ok  = !res.error && (res.data as any)?.success;
-    setMsgMap((m) => ({ ...m, [id]: { ok, text: ok ? `✓ +${amount} likes added` : (res.data as any)?.error ?? "Boost failed" } }));
+    const errText = (res.data as any)?.error ?? res.error?.message ?? "Boost failed — make sure admin_boost_likes SQL has been run in Supabase";
+    setMsgMap((m) => ({ ...m, [id]: { ok, text: ok ? `✓ +${amount} likes added` : errText } }));
     if (ok) setNfts((prev) => prev.map((n) => n.id === id ? { ...n, likes_count: n.likes_count + amount } : n));
     setBoostingId(null);
     setWorking(null);
