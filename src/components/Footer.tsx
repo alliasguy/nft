@@ -160,7 +160,11 @@ export default function Footer() {
         {/* ── Bottom bar ── */}
         <div className="footer__bottom">
           <p className="footer__copyright">
-            © {year} Artsorbit, Inc. All rights reserved.
+            © {year} Artsorbit, Inc. All rights reserved. &nbsp;·&nbsp;{" "}
+            <a href="mailto:support@artsorbit.com"
+              style={{ color: "var(--text-muted)", textDecoration: "none" }}>
+              support@artsorbit.com
+            </a>
           </p>
           <ul className="footer__legal">
             {[
