@@ -59,6 +59,24 @@ function LoginContent() {
   const [status,   setStatus]  = useState<"idle" | "loading" | "error">("idle");
   const [errMsg,   setErrMsg]  = useState("");
 
+  /* Forgot password state */
+  const [forgotMode,    setForgotMode]    = useState(false);
+  const [resetEmail,    setResetEmail]    = useState("");
+  const [resetStatus,   setResetStatus]   = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [resetErr,      setResetErr]      = useState("");
+
+  async function handleResetPassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (!resetEmail) return;
+    setResetStatus("sending"); setResetErr("");
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+    if (error) { setResetErr(error.message); setResetStatus("error"); }
+    else        { setResetStatus("sent"); }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email || !password) return;
@@ -147,7 +165,10 @@ function LoginContent() {
             <div className="form-group">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4375rem" }}>
                 <label className="form-label" htmlFor="password" style={{ marginBottom: 0 }}>Password</label>
-                <a href="#" style={{ fontSize: "0.8125rem", color: "var(--accent)", fontWeight: 500 }}>Forgot password?</a>
+                <button type="button" onClick={() => { setForgotMode(true); setResetEmail(email); }}
+                  style={{ fontSize: "0.8125rem", color: "var(--accent)", fontWeight: 500, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                  Forgot password?
+                </button>
               </div>
               <div className="input-wrapper">
                 <input id="password" className="input" type={showPass ? "text" : "password"}
@@ -182,8 +203,51 @@ function LoginContent() {
             <Link href="/signup" style={{ color: "var(--accent)", fontWeight: 600 }}>Create one free</Link>
           </p>
 
-
         </div>
+
+        {/* ── Forgot password overlay ── */}
+        {forgotMode && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}>
+            <div style={{ background: "var(--bg-elevated)", border: "1px solid var(--border)", borderRadius: "var(--radius-card)", padding: "2rem", width: "100%", maxWidth: 420, margin: "1rem" }}>
+              {resetStatus === "sent" ? (
+                <div style={{ textAlign: "center" }}>
+                  <p style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>📧</p>
+                  <p style={{ fontWeight: 700, fontSize: "1.125rem", color: "var(--text-primary)", marginBottom: "0.5rem" }}>Check your inbox</p>
+                  <p style={{ fontSize: "0.9375rem", color: "var(--text-secondary)", marginBottom: "1.5rem", lineHeight: 1.65 }}>
+                    A password reset link has been sent to <strong style={{ color: "var(--text-primary)" }}>{resetEmail}</strong>.
+                  </p>
+                  <button className="btn btn-gradient" style={{ width: "100%", justifyContent: "center", borderRadius: "9999px" }}
+                    onClick={() => { setForgotMode(false); setResetStatus("idle"); }}>
+                    Back to Sign In
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p style={{ fontWeight: 700, fontSize: "1.125rem", color: "var(--text-primary)", marginBottom: "0.375rem" }}>Reset your password</p>
+                  <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", marginBottom: "1.25rem" }}>
+                    Enter your email and we&rsquo;ll send you a reset link.
+                  </p>
+                  {resetErr && (
+                    <p style={{ fontSize: "0.875rem", color: "var(--error)", marginBottom: "0.75rem" }}>{resetErr}</p>
+                  )}
+                  <form onSubmit={handleResetPassword} style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+                    <input className="input" type="email" placeholder="you@example.com"
+                      value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} required />
+                    <button type="submit" className="btn btn-gradient" disabled={resetStatus === "sending"}
+                      style={{ width: "100%", justifyContent: "center", borderRadius: "9999px" }}>
+                      {resetStatus === "sending" ? "Sending…" : "Send Reset Link"}
+                    </button>
+                    <button type="button" className="btn btn-secondary"
+                      style={{ width: "100%", justifyContent: "center", borderRadius: "9999px" }}
+                      onClick={() => { setForgotMode(false); setResetStatus("idle"); setResetErr(""); }}>
+                      Cancel
+                    </button>
+                  </form>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
