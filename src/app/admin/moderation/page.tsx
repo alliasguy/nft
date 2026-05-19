@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link                                  from "next/link";
 import { createClient }                      from "@/lib/supabase/client";
 import { timeAgo }                           from "@/lib/supabaseToNft";
+import { IcoTrash, IcoPencil, IcoStar, IcoZap } from "@/components/icons";
 
 type ModStatus = "review" | "approved" | "flagged";
 
@@ -502,7 +503,7 @@ export default function ModerationPage() {
                         }}
                         title={!isApproved ? "Approve NFT first" : isFeatured ? "Currently featured" : "Set as hero"}
                       >
-                        ⭐ {isFeatured ? "Hero" : "Feature"}
+                        <IcoStar /> {isFeatured ? "Hero" : "Feature"}
                       </button>
 
                       {/* Edit */}
@@ -516,7 +517,7 @@ export default function ModerationPage() {
                           transition:"color 150ms, background 150ms",
                         }}
                       >
-                        ✎ {editingId===nft.id ? "Close" : "Edit"}
+                        <IcoPencil /> {editingId===nft.id ? "Close" : "Edit"}
                       </button>
 
                       {/* Delete */}
@@ -544,7 +545,7 @@ export default function ModerationPage() {
                           onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
                           title="Delete NFT permanently"
                         >
-                          🗑 Delete
+                          <IcoTrash /> Delete
                         </button>
                       )}
                     </div>
@@ -576,7 +577,7 @@ export default function ModerationPage() {
                         style={{ width:"100%", padding:"0.4375rem", background:"transparent", border:"none", borderTop:"1px solid var(--border-muted)", cursor:"pointer", fontSize:"0.6875rem", fontWeight:700, fontFamily:"var(--font-sans)", color:"var(--text-muted)", transition:"color 150ms, background 150ms" }}
                         onMouseEnter={(e) => { e.currentTarget.style.color="#f15bb5"; e.currentTarget.style.background="rgba(241,91,181,0.06)"; }}
                         onMouseLeave={(e) => { e.currentTarget.style.color="var(--text-muted)"; e.currentTarget.style.background="transparent"; }}>
-                        🔥 Boost Likes
+                        <IcoZap /> Boost Likes
                       </button>
                     )}
 

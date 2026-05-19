@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient }        from "@/lib/supabase/client";
+import { IcoDiamond, IcoDollar, IcoShieldAlert, IcoWrench, IcoAlertTriangle, IcoGear } from "@/components/icons";
 
 /* ── Types ────────────────────────────────────────────────── */
 interface Settings {
@@ -159,7 +160,7 @@ export default function PlatformSettingsPage() {
            ══════════════════════════════════════════════════ */}
         <div className="adm-settings-card" style={{ borderColor:"rgba(254,228,64,0.3)" }}>
           <p className="adm-settings-card__title" style={{ color:"var(--gold)" }}>
-            💎 Deposit Wallet Address
+            <IcoDiamond /> Deposit Wallet Address
           </p>
 
           <p style={{ fontSize:"0.9375rem", color:"var(--text-secondary)", lineHeight:1.65, marginBottom:"1.25rem" }}>
@@ -226,7 +227,7 @@ export default function PlatformSettingsPage() {
             FEES
            ══════════════════════════════════════════════════ */}
         <div className="adm-settings-card">
-          <p className="adm-settings-card__title">💰 Fees &amp; Limits</p>
+          <p className="adm-settings-card__title"><IcoDollar /> Fees &amp; Limits</p>
 
           <p style={{ fontSize:"0.875rem", color:"var(--text-muted)", marginBottom:"1.25rem", lineHeight:1.65 }}>
             These values are read by the database functions at transaction time —
@@ -310,7 +311,7 @@ export default function PlatformSettingsPage() {
             CONTENT MODERATION  (UI state only)
            ══════════════════════════════════════════════════ */}
         <div className="adm-settings-card">
-          <p className="adm-settings-card__title">🛡️ Content Moderation</p>
+          <p className="adm-settings-card__title"><IcoShieldAlert /> Content Moderation</p>
           <Toggle label="Manual review queue"  desc="All new NFT listings enter moderation before going live"        defaultOn={false} />
           <Toggle label="Auto-flag duplicates" desc="Flag NFTs whose artwork hash matches an existing listing"       defaultOn={true}  />
           <Toggle label="NSFW filter"          desc="Restrict explicit content to verified adult accounts"           defaultOn={true}  />
@@ -320,7 +321,7 @@ export default function PlatformSettingsPage() {
             MAINTENANCE (UI state only)
            ══════════════════════════════════════════════════ */}
         <div className="adm-settings-card">
-          <p className="adm-settings-card__title">🔧 Maintenance &amp; Access</p>
+          <p className="adm-settings-card__title"><IcoWrench /> Maintenance &amp; Access</p>
           <Toggle label="New registrations" desc="Allow new users to create accounts"             defaultOn={true}  />
           <Toggle label="New NFT listings"  desc="Allow creators to submit new NFTs"               defaultOn={true}  />
           <Toggle label="Trading paused"    desc="Freeze all buy/sell transactions platform-wide"  defaultOn={false} />
@@ -382,7 +383,7 @@ export default function PlatformSettingsPage() {
         </div>
 
         <div className="adm-settings-card adm-settings-card--danger">
-          <p className="adm-settings-card__title">⚠️ Danger Zone</p>
+          <p className="adm-settings-card__title"><IcoAlertTriangle /> Danger Zone</p>
           <p style={{ fontSize:"0.9375rem", color:"var(--text-secondary)", marginBottom:"1.25rem", lineHeight:1.65 }}>
             These actions are irreversible. Proceed with extreme caution.
           </p>

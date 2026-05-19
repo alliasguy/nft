@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient }        from "@/lib/supabase/client";
 import type { Profile }        from "@/lib/database.types";
+import { IcoKey, IcoBan, IcoUndo, IcoUserPlus, IcoUserMinus, IcoCheck } from "@/components/icons";
 
 type DisplayStatus = "user" | "admin" | "suspended";
 type Filter        = DisplayStatus | "all";
@@ -246,7 +247,7 @@ export default function UsersPage() {
                               <button className="adm-btn-approve"
                                 style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem" }}
                                 disabled={working===u.id} onClick={()=>verify(u)}>
-                                {working===u.id?"…":"✓ Verify"}
+                                {working===u.id?"…":<><IcoCheck /> Verify</>}
                               </button>
                             )}
                             {st!=="admin" && st!=="suspended" && (
@@ -254,21 +255,21 @@ export default function UsersPage() {
                                 style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem",
                                   background:"rgba(254,228,64,0.1)", color:"var(--gold)", borderColor:"rgba(254,228,64,0.3)" }}
                                 disabled={working===u.id} onClick={()=>setRole(u,"admin")}>
-                                {working===u.id?"…":"⚙ Make Admin"}
+                                {working===u.id?"…":<><IcoUserPlus /> Make Admin</>}
                               </button>
                             )}
                             {st==="admin" && u.id!==currentUserId && (
                               <button className="adm-btn-flag"
                                 style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem" }}
                                 disabled={working===u.id} onClick={()=>setRole(u,"user")}>
-                                {working===u.id?"…":"↩ Remove Admin"}
+                                {working===u.id?"…":<><IcoUserMinus /> Remove Admin</>}
                               </button>
                             )}
                             <button className="adm-btn-flag"
                               style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem" }}
                               disabled={working===u.id||u.id===currentUserId}
                               onClick={()=>toggleSuspend(u)}>
-                              {working===u.id?"…":st==="suspended"?"↩ Restore":"⊘ Suspend"}
+                              {working===u.id?"…":st==="suspended"?<><IcoUndo /> Restore</>:<><IcoBan /> Suspend</>}
                             </button>
                             <button
                               style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem",
@@ -276,7 +277,7 @@ export default function UsersPage() {
                                 border:"1px solid rgba(59,130,246,0.3)", cursor:"pointer",
                                 fontFamily:"var(--font-sans)", fontWeight:600 }}
                               onClick={()=>{ setPwTarget(u); setNewPw(""); setPwStatus("idle"); setPwError(""); }}>
-                              🔑 Set Password
+                              <IcoKey /> Set Password
                             </button>
                           </div>
                           {actionMsg?.id===u.id && (
