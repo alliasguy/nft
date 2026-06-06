@@ -29,6 +29,10 @@ export function useProfile(): UseProfileReturn {
         .eq("id", user.id)
         .single();
       if (data) setProfile(data);
+    } catch (err: any) {
+      if (!err?.message?.toLowerCase().includes("lock")) {
+        console.error("[useProfile]", err);
+      }
     } finally {
       setLoading(false);
     }
