@@ -313,6 +313,7 @@ export default function CreatePage() {
 
   /* ── Main form ── */
   return (
+    <>
     <div className="container" style={{ paddingBlock:"clamp(2rem,5vw,3.5rem)" }}>
 
       {/* Page header */}
@@ -670,5 +671,6 @@ export default function CreatePage() {
         </div>
       </div>
     )}
+    </>
   );
 }
