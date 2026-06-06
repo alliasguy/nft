@@ -326,16 +326,19 @@ export default function CreatePage() {
       </div>
 
       {/* Balance bar */}
-      <div style={{ marginBottom:"2rem" }}>
-        <div style={{ display:"inline-block", padding:"1rem 1.25rem",
-          background:"var(--bg-surface)", borderRadius:"var(--radius-lg)",
-          border:`1px solid ${!enoughBalance ? "rgba(239,68,68,0.3)" : "var(--border-muted)"}` }}>
-          <p style={{ fontSize:"0.6875rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase",
-            color: !enoughBalance ? "var(--error)" : "var(--accent)", marginBottom:"0.25rem" }}>Your Balance</p>
-          <p style={{ fontSize:"1.375rem", fontWeight:800, color:"var(--text-primary)", lineHeight:1 }}>
-            {balance !== null ? `${balance.toFixed(4)} ETH` : "—"}
-          </p>
-        </div>
+      <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", marginBottom:"2rem" }}>
+        {[
+          { label:"Your Balance", value: balance !== null ? `${balance.toFixed(4)} ETH` : "—", accent: !enoughBalance },
+          { label:"Minting Fee",  value: `${mintFee} ETH`,                                      accent: false },
+        ].map(({ label, value, accent }) => (
+          <div key={label} style={{ flex:1, minWidth:160, padding:"1rem 1.25rem",
+            background:"var(--bg-surface)", borderRadius:"var(--radius-lg)",
+            border:`1px solid ${accent ? "rgba(239,68,68,0.3)" : "var(--border-muted)"}` }}>
+            <p style={{ fontSize:"0.6875rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase",
+              color: accent ? "var(--error)" : "var(--accent)", marginBottom:"0.25rem" }}>{label}</p>
+            <p style={{ fontSize:"1.375rem", fontWeight:800, color:"var(--text-primary)", lineHeight:1 }}>{value}</p>
+          </div>
+        ))}
       </div>
 
       <form onSubmit={handleSubmit}>
