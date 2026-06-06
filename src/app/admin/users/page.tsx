@@ -48,6 +48,13 @@ export default function UsersPage() {
   const [pwStatus,   setPwStatus]   = useState<"idle"|"saving"|"saved"|"error">("idle");
   const [pwError,    setPwError]    = useState("");
 
+  /* Direct credit modal state */
+  const [creditTarget, setCreditTarget] = useState<ProfileWithEmail|null>(null);
+  const [creditAmt,    setCreditAmt]    = useState("");
+  const [creditNote,   setCreditNote]   = useState("");
+  const [creditStatus, setCreditStatus] = useState<"idle"|"saving"|"saved"|"error">("idle");
+  const [creditError,  setCreditError]  = useState("");
+
   useEffect(() => {
     createClient().auth.getUser().then(({ data: { user } }) => setCurrentUserId(user?.id ?? null));
   }, []);
@@ -113,6 +120,40 @@ export default function UsersPage() {
       setActionMsg({ id: u.id, ok: false, text: (res.data as any)?.error ?? "Action failed." });
     }
     setWorking(null);
+  }
+
+  async function handleDirectCredit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!creditTarget) return;
+    const amount = parseFloat(creditAmt);
+    if (!amount || amount <= 0) { setCreditError("Enter a valid amount."); return; }
+    setCreditStatus("saving"); setCreditError("");
+    const sb  = createClient() as any;
+    const res = await sb.rpc("admin_direct_credit", {
+      p_user_id: creditTarget.id,
+      p_amount:  amount,
+      p_note:    creditNote.trim(),
+    });
+    if ((res.data as any)?.success) {
+      setUsers(prev => prev.map(p =>
+        p.id === creditTarget.id ? { ...p, balance: (res.data as any).new_balance } : p
+      ));
+      fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type:   "direct-credit",
+          userId: creditTarget.id,
+          amount: String(amount),
+          note:   creditNote.trim(),
+        }),
+      }).catch(() => {});
+      setCreditStatus("saved");
+      setTimeout(() => { setCreditStatus("idle"); setCreditTarget(null); setCreditAmt(""); setCreditNote(""); }, 1800);
+    } else {
+      setCreditError((res.data as any)?.error ?? res.error?.message ?? "Failed.");
+      setCreditStatus("error");
+    }
   }
 
   async function handleSetPassword(e: React.FormEvent) {
@@ -279,6 +320,14 @@ export default function UsersPage() {
                               onClick={()=>{ setPwTarget(u); setNewPw(""); setPwStatus("idle"); setPwError(""); }}>
                               <IcoKey /> Set Password
                             </button>
+                            <button
+                              style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem",
+                                background:"rgba(52,211,153,0.1)", color:"#34d399",
+                                border:"1px solid rgba(52,211,153,0.3)", cursor:"pointer",
+                                fontFamily:"var(--font-sans)", fontWeight:600 }}
+                              onClick={()=>{ setCreditTarget(u); setCreditAmt(""); setCreditNote(""); setCreditStatus("idle"); setCreditError(""); }}>
+                              + Credit
+                            </button>
                           </div>
                           {actionMsg?.id===u.id && (
                             <p style={{ fontSize:"0.75rem", color:actionMsg.ok?"#34d399":"#f87171" }}>
@@ -295,6 +344,59 @@ export default function UsersPage() {
           </div>
         )}
       </div>
+
+      {/* ── Direct Credit Modal ── */}
+      {creditTarget && (
+        <div style={{ position:"fixed", inset:0, zIndex:50, display:"flex", alignItems:"center",
+          justifyContent:"center", background:"rgba(0,0,0,0.7)", backdropFilter:"blur(6px)" }}>
+          <div style={{ background:"var(--bg-elevated)", border:"1px solid var(--border)",
+            borderRadius:"var(--radius-card)", padding:"1.75rem", width:"100%", maxWidth:400, margin:"1rem" }}>
+            {creditStatus === "saved" ? (
+              <div style={{ textAlign:"center" }}>
+                <p style={{ fontSize:"2rem", marginBottom:"0.5rem" }}>✅</p>
+                <p style={{ fontWeight:700, color:"var(--text-primary)" }}>Balance credited!</p>
+              </div>
+            ) : (
+              <>
+                <p style={{ fontWeight:700, fontSize:"1rem", color:"var(--text-primary)", marginBottom:"0.25rem" }}>
+                  Direct Credit
+                </p>
+                <p style={{ fontSize:"0.875rem", color:"var(--text-muted)", marginBottom:"1.25rem" }}>
+                  Crediting <strong style={{ color:"var(--text-primary)" }}>{creditTarget.name}</strong>
+                  {" "}— current balance:{" "}
+                  <strong style={{ color:"var(--accent)" }}>{(creditTarget.balance ?? 0).toFixed(4)} ETH</strong>
+                </p>
+                {creditError && <p style={{ fontSize:"0.875rem", color:"var(--error)", marginBottom:"0.75rem" }}>{creditError}</p>}
+                <form onSubmit={handleDirectCredit} style={{ display:"flex", flexDirection:"column", gap:"0.875rem" }}>
+                  <div>
+                    <label style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)",
+                      display:"block", marginBottom:"0.375rem" }}>Amount (ETH)</label>
+                    <input className="adm-input" type="number" step="0.0001" min="0.0001"
+                      placeholder="e.g. 0.5"
+                      value={creditAmt} onChange={(e) => setCreditAmt(e.target.value)} required />
+                  </div>
+                  <div>
+                    <label style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)",
+                      display:"block", marginBottom:"0.375rem" }}>Note (optional)</label>
+                    <input className="adm-input" placeholder="Reason for credit…"
+                      value={creditNote} onChange={(e) => setCreditNote(e.target.value)} />
+                  </div>
+                  <button type="submit" className="adm-save-btn" disabled={creditStatus === "saving"}
+                    style={{ padding:"0.625rem", background:"rgba(52,211,153,0.15)", color:"#34d399",
+                      border:"1px solid rgba(52,211,153,0.3)" }}>
+                    {creditStatus === "saving" ? "Crediting…" : "Credit Balance"}
+                  </button>
+                  <button type="button" className="btn btn-secondary"
+                    style={{ width:"100%", justifyContent:"center" }}
+                    onClick={() => setCreditTarget(null)}>
+                    Cancel
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── Set Password Modal ── */}
       {pwTarget && (

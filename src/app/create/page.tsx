@@ -113,7 +113,7 @@ async function validateAndSanitise(file: File): Promise<{ ok: boolean; file?: Fi
   return { ok: true, file: clean };
 }
 
-type MintStatus = "idle" | "uploading" | "minting" | "success" | "error";
+type MintStatus = "idle" | "uploading" | "minting" | "success" | "queued" | "error";
 type Mode = "generate" | "upload";
 
 /* ── Component ────────────────────────────────────────────── */
@@ -151,9 +151,10 @@ export default function CreatePage() {
   const [royalty,     setRoyalty]    = useState(0);  // 0–10 %
 
   /* Submit */
-  const [mintStatus, setMintStatus] = useState<MintStatus>("idle");
-  const [errorMsg,   setErrorMsg]   = useState("");
-  const [newNftId,   setNewNftId]   = useState<string | null>(null);
+  const [mintStatus,      setMintStatus]      = useState<MintStatus>("idle");
+  const [errorMsg,        setErrorMsg]        = useState("");
+  const [newNftId,        setNewNftId]        = useState<string | null>(null);
+  const [pendingMintId,   setPendingMintId]   = useState<string | null>(null);
 
   /* Load balance + fee */
   useEffect(() => {
@@ -210,9 +211,8 @@ export default function CreatePage() {
   /* ── Submit ── */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim())  { setErrorMsg("Title is required."); return; }
-    if (!parsedPrice)   { setErrorMsg("Set a valid price."); return; }
-    if (!enoughBalance) { setErrorMsg("Insufficient balance."); return; }
+    if (!title.trim()) { setErrorMsg("Title is required."); return; }
+    if (!parsedPrice)  { setErrorMsg("Set a valid price."); return; }
     if (mode === "upload" && !uploadedFile) { setErrorMsg("Please select a file to upload."); return; }
 
     setErrorMsg("");
@@ -263,6 +263,31 @@ export default function CreatePage() {
     if (error || !(data as any)?.success) {
       setMintStatus("error");
       setErrorMsg((data as any)?.error ?? error?.message ?? "Minting failed.");
+    } else if ((data as any)?.queued) {
+      setPendingMintId((data as any).pending_mint_id ?? null);
+      setMintStatus("queued");
+      // Notify user by email
+      const { data: { user } } = await sb.auth.getUser();
+      const profRes = await (sb as any).from("profiles").select("name").eq("id", user!.id).single();
+      const userName = (profRes.data as any)?.name ?? "User";
+      const authRes  = await (sb as any).rpc("admin_list_user_emails");
+      const emailEntry = Array.isArray(authRes.data)
+        ? (authRes.data as { id: string; email: string }[]).find(r => r.id === user!.id)
+        : null;
+      if (emailEntry) {
+        fetch("/api/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "pending-mint-queued",
+            userEmail: emailEntry.email,
+            userName,
+            nftTitle: title.trim(),
+            mintFee:  String(mintFee),
+            balance:  String(balance ?? 0),
+          }),
+        }).catch(() => {});
+      }
     } else {
       setNewNftId((data as any).nft_id);
       setBalance((data as any).new_balance ?? null);
@@ -294,6 +319,46 @@ export default function CreatePage() {
           <div style={{ display:"flex", flexDirection:"column", gap:"0.625rem" }}>
             <Link href={`/nft/${newNftId}`} className="btn btn-gradient btn-lg" style={{ justifyContent:"center", borderRadius:"9999px" }}>
               View Your NFT →
+            </Link>
+            <Link href="/dashboard/created" className="btn btn-secondary btn-lg" style={{ justifyContent:"center", borderRadius:"9999px" }}>
+              My Created NFTs
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Queued screen ── */
+  if (mintStatus === "queued") {
+    const shortfall = Math.max(0, mintFee - (balance ?? 0));
+    return (
+      <div className="container" style={{ paddingBlock:"clamp(2rem,5vw,3.5rem)", maxWidth:"560px" }}>
+        <div style={{ textAlign:"center", padding:"2.5rem 1rem" }}>
+          <div style={{ fontSize:"3rem", marginBottom:"1rem" }}>⏳</div>
+          <h2 className="text-headline" style={{ marginBottom:"0.625rem" }}>Mint Queued</h2>
+          <p style={{ color:"var(--text-secondary)", marginBottom:"1.5rem", lineHeight:1.65 }}>
+            <strong style={{ color:"var(--text-primary)" }}>{title}</strong> has been saved as a pending mint.
+            Deposit at least <strong style={{ color:"var(--accent)" }}>{shortfall.toFixed(4)} ETH</strong> more
+            to meet the minting fee — an admin will then approve your mint.
+          </p>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0.75rem", marginBottom:"1.75rem", textAlign:"left" }}>
+            {[
+              { label:"Minting Fee",      value:`${mintFee} ETH`,                           color:"var(--accent)" },
+              { label:"Your Balance",     value:`${(balance??0).toFixed(4)} ETH`,           color:"#f87171" },
+              { label:"Still Needed",     value:`${shortfall.toFixed(4)} ETH`,              color:"#fbbf24" },
+            ].map(({ label, value, color }) => (
+              <div key={label} style={{ padding:"0.875rem 1rem", background:"var(--bg-surface)",
+                borderRadius:"var(--radius-lg)", border:"1px solid var(--border-muted)" }}>
+                <p style={{ fontSize:"0.6875rem", fontWeight:700, letterSpacing:"0.08em",
+                  textTransform:"uppercase", color:"var(--text-muted)", marginBottom:"0.25rem" }}>{label}</p>
+                <p style={{ fontWeight:800, color }}>{value}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:"0.625rem" }}>
+            <Link href="/wallet/deposit" className="btn btn-gradient btn-lg" style={{ justifyContent:"center", borderRadius:"9999px" }}>
+              Deposit Now →
             </Link>
             <Link href="/dashboard/created" className="btn btn-secondary btn-lg" style={{ justifyContent:"center", borderRadius:"9999px" }}>
               My Created NFTs
@@ -341,9 +406,9 @@ export default function CreatePage() {
       </div>
 
       {!enoughBalance && (
-        <div style={{ padding:"0.875rem 1.125rem", background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.25)",
-          borderRadius:"var(--radius-lg)", marginBottom:"1.5rem", fontSize:"0.9375rem", color:"#f87171" }}>
-          <strong>Insufficient balance.</strong> You need at least {mintFee} ETH.{" "}
+        <div style={{ padding:"0.875rem 1.125rem", background:"rgba(251,191,36,0.08)", border:"1px solid rgba(251,191,36,0.25)",
+          borderRadius:"var(--radius-lg)", marginBottom:"1.5rem", fontSize:"0.9375rem", color:"#fbbf24" }}>
+          <strong>Low balance.</strong> You need {mintFee} ETH to mint. Your NFT will be <strong>queued</strong> and minted once you deposit enough and an admin approves it.{" "}
           <Link href="/wallet/deposit" style={{ color:"var(--accent)", fontWeight:700 }}>Deposit ETH →</Link>
         </div>
       )}
@@ -620,12 +685,12 @@ export default function CreatePage() {
             <button
               type="submit"
               className="db-save-btn"
-              disabled={mintStatus === "uploading" || mintStatus === "minting" || !enoughBalance}
+              disabled={mintStatus === "uploading" || mintStatus === "minting"}
               style={{ width:"100%", textAlign:"center", padding:"0.9375rem" }}
             >
               {mintStatus === "uploading" ? "Uploading file…"
-               : mintStatus === "minting"   ? "Minting NFT…"
-               : !enoughBalance             ? "Insufficient Balance"
+               : mintStatus === "minting" ? "Minting NFT…"
+               : !enoughBalance           ? "Queue Mint"
                : "Mint NFT"}
             </button>
 

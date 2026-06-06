@@ -7,12 +7,13 @@ import { usePathname, useRouter }          from "next/navigation";
 import { createClient }                    from "@/lib/supabase/client";
 
 const NAV: { label: string; href: string; icon: ReactNode; badge?: string }[] = [
-  { label: "Analytics",        href: "/admin",                icon: <IcoAnalytics /> },
-  { label: "User Management",  href: "/admin/users",          icon: <IcoUsers />,   badge: "12,847" },
-  { label: "NFT Moderation",   href: "/admin/moderation",     icon: <IcoShield />,  badge: "8 new"  },
-  { label: "Deposits",         href: "/admin/deposits",       icon: <IcoDeposit />  },
-  { label: "Withdrawals",      href: "/admin/withdrawals",    icon: <IcoWithdraw /> },
-  { label: "Platform Settings",href: "/admin/settings",       icon: <IcoSettings /> },
+  { label: "Analytics",        href: "/admin",                    icon: <IcoAnalytics /> },
+  { label: "User Management",  href: "/admin/users",              icon: <IcoUsers />,   badge: "12,847" },
+  { label: "NFT Moderation",   href: "/admin/moderation",         icon: <IcoShield />,  badge: "8 new"  },
+  { label: "Deposits",         href: "/admin/deposits",           icon: <IcoDeposit />  },
+  { label: "Withdrawals",      href: "/admin/withdrawals",        icon: <IcoWithdraw /> },
+  { label: "Pending Mints",    href: "/admin/pending-mints",      icon: <IcoPendingMint /> },
+  { label: "Platform Settings",href: "/admin/settings",           icon: <IcoSettings /> },
 ];
 
 /* ── Icons ───────────────────────────────────────────────── */
@@ -60,6 +61,13 @@ function IcoWithdraw() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 22V12M8 16l4-4 4 4"/><rect x="3" y="2" width="18" height="6" rx="2"/>
+    </svg>
+  );
+}
+function IcoPendingMint() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
     </svg>
   );
 }

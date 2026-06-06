@@ -156,3 +156,45 @@ export function emailWithdrawalRejected(userName: string, amount: string, note?:
     <a href="${APP_URL}/wallet" class="btn">View Wallet</a>
   `);
 }
+
+export function emailPendingMintQueued(userName: string, nftTitle: string, mintFee: string, balance: string) {
+  return base(`
+    <h2>NFT Mint Queued ⏳</h2>
+    <p>Hi ${userName}, your NFT has been queued for minting. Once your balance reaches the minting fee, an admin will approve it and your NFT will go live.</p>
+    <div class="card"><div class="card-label">NFT Title</div><div class="card-val">${nftTitle}</div></div>
+    <div class="card"><div class="card-label">Minting Fee Required</div><div class="card-val amber">${mintFee} ETH</div></div>
+    <div class="card"><div class="card-label">Your Current Balance</div><div class="card-val red">${balance} ETH</div></div>
+    <p>Deposit at least <strong>${mintFee} ETH</strong> to your wallet to complete the mint.</p>
+    <a href="${APP_URL}/wallet/deposit" class="btn">Deposit Now →</a>
+  `);
+}
+
+export function emailMintApproved(userName: string, nftTitle: string) {
+  return base(`
+    <h2>NFT Minted! 🎨</h2>
+    <p>Hi ${userName}, great news! Your pending NFT has been approved and is now live on the marketplace pending admin review.</p>
+    <div class="card"><div class="card-label">NFT Title</div><div class="card-val green">${nftTitle}</div></div>
+    <div class="card"><div class="card-label">Status</div><div class="card-val green">Minted — Pending Review</div></div>
+    <a href="${APP_URL}/dashboard/created" class="btn">View My NFTs →</a>
+  `);
+}
+
+export function emailMintRejected(userName: string, nftTitle: string, note?: string) {
+  return base(`
+    <h2>Pending Mint Not Approved</h2>
+    <p>Hi ${userName}, your pending mint request for <strong>${nftTitle}</strong> was not approved.</p>
+    ${note ? `<div class="card"><div class="card-label">Reason</div><div class="card-val red">${note}</div></div>` : ""}
+    <p>Please contact our support team if you have questions or would like to resubmit.</p>
+    <a href="${APP_URL}/create" class="btn">Try Again →</a>
+  `);
+}
+
+export function emailDirectCredited(userName: string, amount: string, note?: string) {
+  return base(`
+    <h2>Balance Credited ✓</h2>
+    <p>Hi ${userName}, your Artsorbit wallet has been credited by an administrator.</p>
+    <div class="card"><div class="card-label">Amount Credited</div><div class="card-val green">${amount} ETH</div></div>
+    ${note ? `<div class="card"><div class="card-label">Note</div><div class="card-val">${note}</div></div>` : ""}
+    <a href="${APP_URL}/wallet" class="btn">View Balance →</a>
+  `);
+}

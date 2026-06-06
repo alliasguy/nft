@@ -8,6 +8,8 @@ import {
   emailWithdrawalSubmittedToUser, emailWithdrawalSubmittedToAdmin,
   emailDepositApproved,   emailDepositRejected,
   emailWithdrawalCompleted, emailWithdrawalRejected,
+  emailPendingMintQueued, emailMintApproved, emailMintRejected,
+  emailDirectCredited,
 } from "@/lib/email";
 
 /* Look up a target user's email + name via the service-role key.
@@ -132,6 +134,59 @@ export async function POST(req: Request) {
           to:      target.email,
           subject: "Withdrawal request update — Artsorbit",
           html:    emailWithdrawalRejected(target.name, body.amount, body.note),
+        });
+      }
+      break;
+    }
+
+    /* ── Pending mint (user-triggered) ───────────────────────── */
+
+    case "pending-mint-queued": {
+      const sb = await createClient();
+      const { data: { user } } = await sb.auth.getUser();
+      if (user) {
+        await sendEmail({
+          to:      body.userEmail,
+          subject: "NFT mint queued — Artsorbit",
+          html:    emailPendingMintQueued(body.userName, body.nftTitle, body.mintFee, body.balance),
+        });
+      }
+      break;
+    }
+
+    /* ── Pending mint admin-triggered ────────────────────────── */
+
+    case "mint-approved": {
+      const target = await getTargetUser(body.userId);
+      if (target) {
+        await sendEmail({
+          to:      target.email,
+          subject: "Your NFT has been minted! — Artsorbit",
+          html:    emailMintApproved(target.name, body.nftTitle),
+        });
+      }
+      break;
+    }
+
+    case "mint-rejected": {
+      const target = await getTargetUser(body.userId);
+      if (target) {
+        await sendEmail({
+          to:      target.email,
+          subject: "Pending mint update — Artsorbit",
+          html:    emailMintRejected(target.name, body.nftTitle, body.note),
+        });
+      }
+      break;
+    }
+
+    case "direct-credit": {
+      const target = await getTargetUser(body.userId);
+      if (target) {
+        await sendEmail({
+          to:      target.email,
+          subject: "Balance credited — Artsorbit",
+          html:    emailDirectCredited(target.name, body.amount, body.note),
         });
       }
       break;
