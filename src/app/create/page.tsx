@@ -389,29 +389,17 @@ export default function CreatePage() {
       </div>
 
       {/* Balance bar */}
-      <div style={{ display:"flex", gap:"1rem", flexWrap:"wrap", marginBottom:"2rem" }}>
-        {[
-          { label:"Your Balance",          value: balance !== null ? `${balance.toFixed(4)} ETH` : "—",  accent:!enoughBalance },
-          { label:"Minting Fee",           value: `${mintFee} ETH`,                                       accent:false },
-          { label:"Balance After Minting", value: afterMint !== null ? `${afterMint.toFixed(4)} ETH` : "—", accent: afterMint !== null && afterMint < 0 },
-        ].map(({ label, value, accent }) => (
-          <div key={label} style={{ flex:1, minWidth:160, padding:"1rem 1.25rem",
-            background:"var(--bg-surface)", borderRadius:"var(--radius-lg)",
-            border:`1px solid ${accent ? "rgba(239,68,68,0.3)" : "var(--border-muted)"}` }}>
-            <p style={{ fontSize:"0.6875rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase",
-              color: accent ? "var(--error)" : "var(--accent)", marginBottom:"0.25rem" }}>{label}</p>
-            <p style={{ fontSize:"1.375rem", fontWeight:800, color:"var(--text-primary)", lineHeight:1 }}>{value}</p>
-          </div>
-        ))}
-      </div>
-
-      {!enoughBalance && (
-        <div style={{ padding:"0.875rem 1.125rem", background:"rgba(251,191,36,0.08)", border:"1px solid rgba(251,191,36,0.25)",
-          borderRadius:"var(--radius-lg)", marginBottom:"1.5rem", fontSize:"0.9375rem", color:"#fbbf24" }}>
-          <strong>Low balance.</strong> You need {mintFee} ETH to mint. Your NFT will be <strong>queued</strong> and minted once you deposit enough and an admin approves it.{" "}
-          <Link href="/wallet/deposit" style={{ color:"var(--accent)", fontWeight:700 }}>Deposit ETH →</Link>
+      <div style={{ marginBottom:"2rem" }}>
+        <div style={{ display:"inline-block", padding:"1rem 1.25rem",
+          background:"var(--bg-surface)", borderRadius:"var(--radius-lg)",
+          border:`1px solid ${!enoughBalance ? "rgba(239,68,68,0.3)" : "var(--border-muted)"}` }}>
+          <p style={{ fontSize:"0.6875rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase",
+            color: !enoughBalance ? "var(--error)" : "var(--accent)", marginBottom:"0.25rem" }}>Your Balance</p>
+          <p style={{ fontSize:"1.375rem", fontWeight:800, color:"var(--text-primary)", lineHeight:1 }}>
+            {balance !== null ? `${balance.toFixed(4)} ETH` : "—"}
+          </p>
         </div>
-      )}
+      </div>
 
       <form onSubmit={handleSubmit}>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(320px,1fr))", gap:"1.5rem", alignItems:"start" }}>

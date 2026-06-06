@@ -79,7 +79,6 @@ export default function WalletPage() {
     return new Date(bDate).getTime() - new Date(aDate).getTime();
   });
 
-  const usdVal = balance !== null ? (balance * 3900).toLocaleString("en-US", { maximumFractionDigits: 0 }) : "—";
 
   if (loading) {
     return (
@@ -110,9 +109,6 @@ export default function WalletPage() {
           <p style={{ fontSize:"2.5rem", fontWeight:900, letterSpacing:"-0.03em", color:"var(--text-primary)", lineHeight:1, position:"relative" }}>
             {balance !== null ? balance.toFixed(4) : "—"}
             <span style={{ fontSize:"1.125rem", fontWeight:600, color:"var(--text-secondary)", marginLeft:"0.375rem" }}>ETH</span>
-          </p>
-          <p style={{ fontSize:"0.9375rem", color:"var(--text-muted)", marginTop:"0.375rem", position:"relative" }}>
-            ≈ ${usdVal} USD
           </p>
         </div>
 
