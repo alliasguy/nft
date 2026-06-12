@@ -23,12 +23,13 @@ const DASHBOARD_LINKS = [
 ];
 
 const ADMIN_LINKS = [
-  { label: "Analytics",   href: "/admin"                },
-  { label: "Users",       href: "/admin/users"          },
-  { label: "Moderation",  href: "/admin/moderation"     },
-  { label: "Deposits",    href: "/admin/deposits"       },
-  { label: "Withdrawals", href: "/admin/withdrawals"    },
-  { label: "Settings",    href: "/admin/settings"       },
+  { label: "Analytics",     href: "/admin"                },
+  { label: "Users",         href: "/admin/users"          },
+  { label: "Moderation",    href: "/admin/moderation"     },
+  { label: "Deposits",      href: "/admin/deposits"       },
+  { label: "Withdrawals",   href: "/admin/withdrawals"    },
+  { label: "Pending Mints", href: "/admin/pending-mints"  },
+  { label: "Settings",      href: "/admin/settings"       },
 ];
 
 /* ── Icons ───────────────────────────────────────────────── */

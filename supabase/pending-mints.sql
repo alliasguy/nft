@@ -186,15 +186,8 @@ BEGIN
   SELECT balance, handle, name INTO v_balance, v_handle, v_name
   FROM profiles WHERE id = v_mint.user_id FOR UPDATE;
 
-  IF v_balance < v_mint.minting_fee THEN
-    RETURN json_build_object(
-      'success',  false,
-      'error',    'User still has insufficient balance',
-      'balance',  v_balance,
-      'required', v_mint.minting_fee
-    );
-  END IF;
-
+  -- Admin approval overrides the balance check — proceed even if the
+  -- user still doesn't have enough to cover the minting fee.
   UPDATE profiles SET balance = balance - v_mint.minting_fee WHERE id = v_mint.user_id;
 
   SELECT COUNT(*) + 1 INTO v_token_num FROM nfts WHERE creator_id = v_mint.user_id;
