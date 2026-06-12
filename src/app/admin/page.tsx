@@ -31,12 +31,6 @@ interface Transaction {
 interface DayVolume { day: string; volume: number; tx_count: number; }
 
 /* ── Helpers ─────────────────────────────────────────────── */
-const ETH_USD = 3_900;
-
-function usd(eth: number) {
-  return (eth * ETH_USD).toLocaleString("en-US", { maximumFractionDigits: 0 });
-}
-
 function pctChange(now: number, prev: number): string {
   if (!prev) return now > 0 ? "▲ New activity" : "No activity yet";
   const pct = ((now - prev) / prev) * 100;
@@ -114,15 +108,13 @@ export default function AdminAnalyticsPage() {
     ? [
         {
           icon:"💎", label:"Total Platform Volume",
-          value: analytics.total_volume_eth > 0
-            ? `$${usd(analytics.total_volume_eth)}`
-            : "$0",
-          change: `${analytics.total_volume_eth.toFixed(4)} ETH all-time`,
+          value: `${analytics.total_volume_eth.toFixed(4)} ETH`,
+          change: "all-time",
           up: true,
         },
         {
           icon:"⚡", label:"24h Trading Volume",
-          value: `$${usd(analytics.volume_24h_eth)}`,
+          value: `${analytics.volume_24h_eth.toFixed(4)} ETH`,
           change: pctChange(analytics.volume_24h_eth, analytics.volume_prev_24h),
           up: analytics.volume_24h_eth >= analytics.volume_prev_24h,
         },

@@ -113,7 +113,7 @@ async function validateAndSanitise(file: File): Promise<{ ok: boolean; file?: Fi
   return { ok: true, file: clean };
 }
 
-type MintStatus = "idle" | "uploading" | "minting" | "success" | "error";
+type MintStatus = "idle" | "uploading" | "minting" | "success" | "queued" | "error";
 type Mode = "generate" | "upload";
 
 /* ── Component ────────────────────────────────────────────── */
@@ -154,7 +154,6 @@ export default function CreatePage() {
   const [mintStatus,        setMintStatus]        = useState<MintStatus>("idle");
   const [errorMsg,          setErrorMsg]          = useState("");
   const [newNftId,          setNewNftId]          = useState<string | null>(null);
-  const [showLowBalModal,   setShowLowBalModal]   = useState(false);
 
   /* Load balance + fee */
   useEffect(() => {
@@ -205,7 +204,6 @@ export default function CreatePage() {
   /* Derived */
   const parsedPrice   = parseFloat(price) || 0;
   const enoughBalance = balance !== null && balance >= mintFee;
-  const afterMint     = balance !== null ? balance - mintFee : null;
   const stops: [string, string] = useMemo(() => [color1, color2], [color1, color2]);
 
   /* ── Submit ── */
@@ -213,7 +211,6 @@ export default function CreatePage() {
     e.preventDefault();
     if (!title.trim())  { setErrorMsg("Title is required."); return; }
     if (!parsedPrice)   { setErrorMsg("Set a valid price."); return; }
-    if (!enoughBalance) { setShowLowBalModal(true); return; }
     if (mode === "upload" && !uploadedFile) { setErrorMsg("Please select a file to upload."); return; }
 
     setErrorMsg("");
@@ -264,6 +261,9 @@ export default function CreatePage() {
     if (error || !(data as any)?.success) {
       setMintStatus("error");
       setErrorMsg((data as any)?.error ?? error?.message ?? "Minting failed.");
+    } else if ((data as any).queued) {
+      setBalance((data as any).balance ?? balance);
+      setMintStatus("queued");
     } else {
       setNewNftId((data as any).nft_id);
       setBalance((data as any).new_balance ?? null);
@@ -305,6 +305,37 @@ export default function CreatePage() {
     );
   }
 
+  /* ── Queued (insufficient balance) screen ── */
+  if (mintStatus === "queued") {
+    const shortfall = Math.max(0, mintFee - (balance ?? 0));
+    return (
+      <div className="container" style={{ paddingBlock:"clamp(2rem,5vw,3.5rem)", maxWidth:"560px" }}>
+        <div style={{ textAlign:"center", padding:"2.5rem 1rem" }}>
+          <div style={{ fontSize:"3rem", marginBottom:"1rem" }}>⏳</div>
+          <h2 className="text-headline" style={{ marginBottom:"0.625rem" }}>NFT Pending — Awaiting Balance</h2>
+          <p style={{ color:"var(--text-secondary)", marginBottom:"1.5rem", lineHeight:1.65 }}>
+            <strong style={{ color:"var(--text-primary)" }}>{title}</strong> has been saved and will be minted once your
+            balance covers the <strong style={{ color:"var(--accent)" }}>{mintFee} ETH</strong> minting fee.
+            Your current balance is <strong style={{ color:"#f87171" }}>{(balance ?? 0).toFixed(4)} ETH</strong> —{" "}
+            <strong style={{ color:"#fbbf24" }}>{shortfall.toFixed(4)} ETH</strong> short.
+          </p>
+          <p style={{ color:"var(--text-muted)", marginBottom:"2rem", fontSize:"0.875rem" }}>
+            Once your balance is sufficient, an admin can approve the mint and your NFT will go live automatically.
+            You can track its status from your dashboard.
+          </p>
+          <div style={{ display:"flex", flexDirection:"column", gap:"0.625rem" }}>
+            <Link href="/wallet/deposit" className="btn btn-gradient btn-lg" style={{ justifyContent:"center", borderRadius:"9999px" }}>
+              Deposit ETH →
+            </Link>
+            <Link href="/dashboard" className="btn btn-secondary btn-lg" style={{ justifyContent:"center", borderRadius:"9999px" }}>
+              Go to Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) return (
     <div className="container section" style={{ textAlign:"center", color:"var(--text-muted)" }}>
       Loading your account…
@@ -313,7 +344,6 @@ export default function CreatePage() {
 
   /* ── Main form ── */
   return (
-    <>
     <div className="container" style={{ paddingBlock:"clamp(2rem,5vw,3.5rem)" }}>
 
       {/* Page header */}
@@ -631,49 +661,5 @@ export default function CreatePage() {
       </form>
 
     </div>
-
-    {/* ── Insufficient balance modal ── */}
-    {showLowBalModal && (
-      <div
-        style={{ position:"fixed", inset:0, zIndex:50, display:"flex", alignItems:"center",
-          justifyContent:"center", background:"rgba(0,0,0,0.75)", backdropFilter:"blur(6px)" }}
-        onClick={() => setShowLowBalModal(false)}
-      >
-        <div
-          style={{ background:"var(--bg-elevated)", border:"1px solid var(--border)",
-            borderRadius:"var(--radius-card)", padding:"2rem", width:"100%", maxWidth:380,
-            margin:"1rem", textAlign:"center" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div style={{ fontSize:"2.5rem", marginBottom:"0.75rem" }}>⚠️</div>
-          <h3 style={{ fontSize:"1.125rem", fontWeight:700, color:"var(--text-primary)", marginBottom:"0.5rem" }}>
-            Insufficient Balance
-          </h3>
-          <p style={{ fontSize:"0.9375rem", color:"var(--text-secondary)", marginBottom:"1.5rem", lineHeight:1.6 }}>
-            You need at least <strong style={{ color:"var(--accent)" }}>{mintFee} ETH</strong> to mint.
-            Your current balance is{" "}
-            <strong style={{ color:"#f87171" }}>{(balance ?? 0).toFixed(4)} ETH</strong> —{" "}
-            <strong style={{ color:"#fbbf24" }}>{Math.max(0, mintFee - (balance ?? 0)).toFixed(4)} ETH</strong> short.
-          </p>
-          <div style={{ display:"flex", flexDirection:"column", gap:"0.625rem" }}>
-            <Link
-              href="/wallet/deposit"
-              className="btn btn-gradient"
-              style={{ justifyContent:"center", borderRadius:"9999px", padding:"0.75rem" }}
-            >
-              Deposit ETH →
-            </Link>
-            <button
-              className="btn btn-secondary"
-              style={{ width:"100%", justifyContent:"center", borderRadius:"9999px", padding:"0.75rem" }}
-              onClick={() => setShowLowBalModal(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
-    </>
   );
 }

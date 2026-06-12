@@ -9,7 +9,7 @@ import {
   emailDepositApproved,   emailDepositRejected,
   emailWithdrawalCompleted, emailWithdrawalRejected,
   emailPendingMintQueued, emailMintApproved, emailMintRejected,
-  emailDirectCredited,
+  emailDirectCredited, emailDirectDebited,
 } from "@/lib/email";
 
 /* Look up a target user's email + name via the service-role key.
@@ -187,6 +187,18 @@ export async function POST(req: Request) {
           to:      target.email,
           subject: "Balance credited — Artsorbit",
           html:    emailDirectCredited(target.name, body.amount, body.note),
+        });
+      }
+      break;
+    }
+
+    case "direct-debit": {
+      const target = await getTargetUser(body.userId);
+      if (target) {
+        await sendEmail({
+          to:      target.email,
+          subject: "Balance adjusted — Artsorbit",
+          html:    emailDirectDebited(target.name, body.amount, body.note),
         });
       }
       break;

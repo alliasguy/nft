@@ -109,7 +109,7 @@ export default function DashboardOverview() {
   const STATS = [
     {
       icon: "💎", label: "Portfolio Value",
-      value:  nftsLoading   ? null : portfolioEth > 0 ? `$${(portfolioEth * 3_900).toLocaleString()}` : "$0",
+      value:  nftsLoading   ? null : `${portfolioEth.toFixed(4)} ETH`,
       change: nftsLoading   ? null : `${ownedCount} NFT${ownedCount !== 1 ? "s" : ""} owned`,
       up: true,
     },

@@ -1960,7 +1960,7 @@ button {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 1.25rem;
   line-height: 1;
 }
 .buy-box__eth {
@@ -1973,11 +1973,6 @@ button {
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text-secondary);
-}
-.buy-box__usd {
-  font-size: 0.9375rem;
-  color: var(--text-muted);
-  margin-bottom: 1.25rem;
 }
 .buy-box__actions {
   display: flex;
@@ -2049,12 +2044,6 @@ button {
   color: var(--text-primary);
   white-space: nowrap;
 }
-.bid-row__usd {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-top: 0.0625rem;
-}
-
 /* ============================================================
    AUTH PAGES  (login / signup)
    ============================================================ */
@@ -3104,6 +3093,7 @@ button {
 .adm-status--completed { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
 .adm-status--pending   { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
 .adm-status--failed    { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+.adm-status--rejected  { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
 .adm-status--approved  { background: var(--accent-muted); color: var(--accent-light); border: 1px solid var(--accent-border); }
 .adm-status--review    { background: var(--gold-muted); color: var(--gold); border: 1px solid rgba(254,228,64,0.3); }
 .adm-status--flagged   { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }

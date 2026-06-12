@@ -10,6 +10,19 @@ import type { NFTRow }         from "@/lib/database.types";
 
 const CATEGORIES = ["Art","Music","Photography","Gaming","Virtual Worlds"] as const;
 
+interface PendingMint {
+  id:          string;
+  title:       string;
+  image_url:   string | null;
+  art_stop_1:  string;
+  art_stop_2:  string;
+  price:       number;
+  minting_fee: number;
+  mint_status: "pending" | "approved" | "rejected";
+  admin_note:  string | null;
+  created_at:  string;
+}
+
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 interface EditForm {
@@ -223,9 +236,10 @@ function EditPanel({
 /* ── Page ─────────────────────────────────────────────────── */
 export default function CreatedPage() {
   const { userId, loading: profileLoading } = useProfile();
-  const [nfts,      setNfts]      = useState<NFTRow[] | null>(null);
-  const [loading,   setLoading]   = useState(true);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [nfts,         setNfts]         = useState<NFTRow[] | null>(null);
+  const [loading,      setLoading]      = useState(true);
+  const [editingId,    setEditingId]    = useState<string | null>(null);
+  const [pendingMints, setPendingMints] = useState<PendingMint[] | null>(null);
 
   useEffect(() => {
     if (!userId) return;
@@ -263,7 +277,17 @@ export default function CreatedPage() {
         setLoading(false);
       }
     }
+    async function loadPending() {
+      const { data } = await sba
+        .from("pending_mints")
+        .select("id, title, image_url, art_stop_1, art_stop_2, price, minting_fee, mint_status, admin_note, created_at")
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      setPendingMints((data as PendingMint[]) ?? []);
+    }
     load();
+    loadPending();
   }, [userId]);
 
   /* Merge saved edits back into local state without a full refetch */
@@ -297,6 +321,40 @@ export default function CreatedPage() {
       </div>
 
       <div className="db-page-body">
+
+        {/* ── Pending mints ── */}
+        {pendingMints && pendingMints.filter((m) => m.mint_status !== "approved").length > 0 && (
+          <div className="db-section">
+            <p className="db-section-title">Pending Mints</p>
+            <div className="db-activity-list">
+              {pendingMints.filter((m) => m.mint_status !== "approved").map((m) => (
+                <div key={m.id} className="db-activity-row">
+                  {m.image_url ? (
+                    <img src={m.image_url} alt={m.title}
+                      style={{ width:"2.5rem", height:"2.5rem", objectFit:"cover", borderRadius:"0.5rem", flexShrink:0, border:"1px solid var(--border-muted)" }} />
+                  ) : (
+                    <div className="db-activity-icon" style={{ background:`linear-gradient(135deg,${m.art_stop_1},${m.art_stop_2})`, border:"none" }} />
+                  )}
+                  <div className="db-activity-info">
+                    <p className="db-activity-title">{m.title}</p>
+                    <p className="db-activity-sub">
+                      {m.mint_status === "pending"
+                        ? `Awaiting admin approval — minting fee ${m.minting_fee} ETH`
+                        : m.admin_note
+                          ? `Rejected: ${m.admin_note}`
+                          : "Rejected by admin"}
+                    </p>
+                  </div>
+                  <div className="db-activity-right">
+                    <span className={`adm-status adm-status--${m.mint_status === "pending" ? "pending" : "rejected"}`}>
+                      {m.mint_status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {isEmpty && (
           <div style={{ textAlign:"center", padding:"5rem 1rem" }}>

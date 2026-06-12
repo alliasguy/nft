@@ -55,6 +55,13 @@ export default function UsersPage() {
   const [creditStatus, setCreditStatus] = useState<"idle"|"saving"|"saved"|"error">("idle");
   const [creditError,  setCreditError]  = useState("");
 
+  /* Direct debit modal state */
+  const [debitTarget, setDebitTarget] = useState<ProfileWithEmail|null>(null);
+  const [debitAmt,    setDebitAmt]    = useState("");
+  const [debitNote,   setDebitNote]   = useState("");
+  const [debitStatus, setDebitStatus] = useState<"idle"|"saving"|"saved"|"error">("idle");
+  const [debitError,  setDebitError]  = useState("");
+
   useEffect(() => {
     createClient().auth.getUser().then(({ data: { user } }) => setCurrentUserId(user?.id ?? null));
   }, []);
@@ -153,6 +160,40 @@ export default function UsersPage() {
     } else {
       setCreditError((res.data as any)?.error ?? res.error?.message ?? "Failed.");
       setCreditStatus("error");
+    }
+  }
+
+  async function handleDirectDebit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!debitTarget) return;
+    const amount = parseFloat(debitAmt);
+    if (!amount || amount <= 0) { setDebitError("Enter a valid amount."); return; }
+    setDebitStatus("saving"); setDebitError("");
+    const sb  = createClient() as any;
+    const res = await sb.rpc("admin_direct_debit", {
+      p_user_id: debitTarget.id,
+      p_amount:  amount,
+      p_note:    debitNote.trim(),
+    });
+    if ((res.data as any)?.success) {
+      setUsers(prev => prev.map(p =>
+        p.id === debitTarget.id ? { ...p, balance: (res.data as any).new_balance } : p
+      ));
+      fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type:   "direct-debit",
+          userId: debitTarget.id,
+          amount: String(amount),
+          note:   debitNote.trim(),
+        }),
+      }).catch(() => {});
+      setDebitStatus("saved");
+      setTimeout(() => { setDebitStatus("idle"); setDebitTarget(null); setDebitAmt(""); setDebitNote(""); }, 1800);
+    } else {
+      setDebitError((res.data as any)?.error ?? res.error?.message ?? "Failed.");
+      setDebitStatus("error");
     }
   }
 
@@ -328,6 +369,14 @@ export default function UsersPage() {
                               onClick={()=>{ setCreditTarget(u); setCreditAmt(""); setCreditNote(""); setCreditStatus("idle"); setCreditError(""); }}>
                               + Credit
                             </button>
+                            <button
+                              style={{ borderRadius:"0.375rem", padding:"0.3125rem 0.625rem", fontSize:"0.75rem",
+                                background:"rgba(248,113,113,0.1)", color:"#f87171",
+                                border:"1px solid rgba(248,113,113,0.3)", cursor:"pointer",
+                                fontFamily:"var(--font-sans)", fontWeight:600 }}
+                              onClick={()=>{ setDebitTarget(u); setDebitAmt(""); setDebitNote(""); setDebitStatus("idle"); setDebitError(""); }}>
+                              − Debit
+                            </button>
                           </div>
                           {actionMsg?.id===u.id && (
                             <p style={{ fontSize:"0.75rem", color:actionMsg.ok?"#34d399":"#f87171" }}>
@@ -389,6 +438,59 @@ export default function UsersPage() {
                   <button type="button" className="btn btn-secondary"
                     style={{ width:"100%", justifyContent:"center" }}
                     onClick={() => setCreditTarget(null)}>
+                    Cancel
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Direct Debit Modal ── */}
+      {debitTarget && (
+        <div style={{ position:"fixed", inset:0, zIndex:50, display:"flex", alignItems:"center",
+          justifyContent:"center", background:"rgba(0,0,0,0.7)", backdropFilter:"blur(6px)" }}>
+          <div style={{ background:"var(--bg-elevated)", border:"1px solid var(--border)",
+            borderRadius:"var(--radius-card)", padding:"1.75rem", width:"100%", maxWidth:400, margin:"1rem" }}>
+            {debitStatus === "saved" ? (
+              <div style={{ textAlign:"center" }}>
+                <p style={{ fontSize:"2rem", marginBottom:"0.5rem" }}>✅</p>
+                <p style={{ fontWeight:700, color:"var(--text-primary)" }}>Balance debited!</p>
+              </div>
+            ) : (
+              <>
+                <p style={{ fontWeight:700, fontSize:"1rem", color:"var(--text-primary)", marginBottom:"0.25rem" }}>
+                  Direct Debit
+                </p>
+                <p style={{ fontSize:"0.875rem", color:"var(--text-muted)", marginBottom:"1.25rem" }}>
+                  Debiting <strong style={{ color:"var(--text-primary)" }}>{debitTarget.name}</strong>
+                  {" "}— current balance:{" "}
+                  <strong style={{ color:"var(--accent)" }}>{(debitTarget.balance ?? 0).toFixed(4)} ETH</strong>
+                </p>
+                {debitError && <p style={{ fontSize:"0.875rem", color:"var(--error)", marginBottom:"0.75rem" }}>{debitError}</p>}
+                <form onSubmit={handleDirectDebit} style={{ display:"flex", flexDirection:"column", gap:"0.875rem" }}>
+                  <div>
+                    <label style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)",
+                      display:"block", marginBottom:"0.375rem" }}>Amount (ETH)</label>
+                    <input className="adm-input" type="number" step="0.0001" min="0.0001"
+                      placeholder="e.g. 0.5"
+                      value={debitAmt} onChange={(e) => setDebitAmt(e.target.value)} required />
+                  </div>
+                  <div>
+                    <label style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--text-muted)",
+                      display:"block", marginBottom:"0.375rem" }}>Note (optional)</label>
+                    <input className="adm-input" placeholder="Reason for debit…"
+                      value={debitNote} onChange={(e) => setDebitNote(e.target.value)} />
+                  </div>
+                  <button type="submit" className="adm-save-btn" disabled={debitStatus === "saving"}
+                    style={{ padding:"0.625rem", background:"rgba(248,113,113,0.15)", color:"#f87171",
+                      border:"1px solid rgba(248,113,113,0.3)" }}>
+                    {debitStatus === "saving" ? "Debiting…" : "Debit Balance"}
+                  </button>
+                  <button type="button" className="btn btn-secondary"
+                    style={{ width:"100%", justifyContent:"center" }}
+                    onClick={() => setDebitTarget(null)}>
                     Cancel
                   </button>
                 </form>

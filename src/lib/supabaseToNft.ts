@@ -19,11 +19,6 @@ export function timeAgo(dateStr: string): string {
   return `${days} day${days > 1 ? "s" : ""} ago`;
 }
 
-/* ── USD estimate when not stored ────────────────────────── */
-function estimateUsd(ethPrice: number): string {
-  return (ethPrice * 3_900).toLocaleString("en-US", { maximumFractionDigits: 0 });
-}
-
 /* ── Row types from related tables ──────────────────────── */
 export interface SupabaseTrait {
   label:         string;
@@ -69,7 +64,6 @@ export function rowToNftItem(
       return {
         bidder:   bidderName,
         amount:   String(b.amount),
-        usd:      estimateUsd(b.amount),
         time:     timeAgo(b.created_at),
         gradient: nameGradient(bidderName),
       };
@@ -89,7 +83,6 @@ export function rowToNftItem(
       gradient: row.creator_gradient ?? "linear-gradient(135deg,#00f5d4,#f15bb5)",
     },
     price:       String(row.price),
-    usd:         row.usd_price ?? estimateUsd(row.price),
     description: row.description ?? "",
     category:    row.category as Category,
     status:      row.status   as Status,

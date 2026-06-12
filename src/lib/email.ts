@@ -198,3 +198,13 @@ export function emailDirectCredited(userName: string, amount: string, note?: str
     <a href="${APP_URL}/wallet" class="btn">View Balance →</a>
   `);
 }
+
+export function emailDirectDebited(userName: string, amount: string, note?: string) {
+  return base(`
+    <h2>Balance Adjusted</h2>
+    <p>Hi ${userName}, your Artsorbit wallet balance has been adjusted by an administrator.</p>
+    <div class="card"><div class="card-label">Amount Debited</div><div class="card-val red">${amount} ETH</div></div>
+    ${note ? `<div class="card"><div class="card-label">Note</div><div class="card-val">${note}</div></div>` : ""}
+    <a href="${APP_URL}/wallet" class="btn">View Balance →</a>
+  `);
+}

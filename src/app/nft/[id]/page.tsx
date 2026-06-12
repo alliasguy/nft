@@ -131,7 +131,7 @@ export default async function NFTDetailPage({
   if (!nft) notFound();
 
   const {
-    title, art, creator, price, usd, description,
+    title, art, creator, price, description,
     category, status, likes, collection, tokenId,
     views, traits, bids, image_url,
   } = nft;
@@ -279,7 +279,6 @@ export default async function NFTDetailPage({
               }
               nftTitle={title}
               price={price}
-              usd={usd}
               isAuction={isAuction}
               initialLikes={likes}
               creatorId={creatorId}
@@ -328,7 +327,6 @@ export default async function NFTDetailPage({
                   {/* Amount */}
                   <div className="bid-row__amount">
                     <p className="bid-row__eth">{bid.amount} ETH</p>
-                    <p className="bid-row__usd">${bid.usd}</p>
                   </div>
                 </div>
               ))}

@@ -9,7 +9,6 @@ interface BuySectionProps {
   nftId:        string;
   nftTitle:     string;
   price:        string;
-  usd:          string;
   isAuction:    boolean;
   initialLikes: number;
   creatorId?:   string | null;
@@ -48,7 +47,7 @@ type BuyState  = "idle" | "confirming" | "purchasing" | "purchased" | "error";
 type BidStatus = "idle" | "placing" | "placed" | "withdrawing" | "error";
 
 export default function BuySection({
-  nftId, nftTitle, price, usd, isAuction, initialLikes, creatorId,
+  nftId, nftTitle, price, isAuction, initialLikes, creatorId,
   royaltyPct = 0,
 }: BuySectionProps) {
   /* ── Shared state ── */
@@ -479,7 +478,6 @@ export default function BuySection({
               <span className="buy-box__eth">{price}</span>
               <span className="buy-box__currency">ETH</span>
             </div>
-            <p className="buy-box__usd">≈ ${usd} USD</p>
 
             {errorMsg && <p style={{ fontSize:"0.875rem", color:"var(--error)", marginBottom:"0.75rem" }}>{errorMsg}</p>}
 
@@ -525,7 +523,6 @@ export default function BuySection({
               <span className="buy-box__eth">{price}</span>
               <span className="buy-box__currency">ETH</span>
             </div>
-            <p className="buy-box__usd">≈ ${usd} USD</p>
             <div style={{ background:"var(--bg-overlay)", borderRadius:"var(--radius-md)", padding:"0.875rem 1rem", marginBottom:"1.125rem", display:"flex", flexDirection:"column", gap:"0.5rem" }}>
               {([
                 { label:"You pay",          val:`${price} ETH`, bold:true },
